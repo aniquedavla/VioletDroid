@@ -6,6 +6,11 @@ import android.graphics.Rect;
 /**
  * Created by vishaalprasad on 10/27/16.
  */
+
+/**
+ * A ClassDiagItem represents one Item in a Class Diagram Editor
+ * It contains the text and the Rectangle around the text
+ */
 public class ClassDiagItem {
     private static final String TAG = "ClassDiagItem";
 
@@ -19,6 +24,13 @@ public class ClassDiagItem {
 
     private static final int DEFAULT_PADDING = 20;
 
+    /**
+     * Create a new ClassDiagItem
+     *
+     * @param content
+     * @param x
+     * @param y
+     */
     public ClassDiagItem(String content, float x, float y) {
         this.content = content;
         this.x = x;
@@ -27,6 +39,12 @@ public class ClassDiagItem {
         setRect();
     }
 
+    /**
+     * Set the position (bottom left)
+     *
+     * @param x
+     * @param y
+     */
     public void set(float x, float y) {
         this.x = x;
         this.y = y;
@@ -45,6 +63,9 @@ public class ClassDiagItem {
         return content;
     }
 
+    /**
+     * to be used internally, sets the outline of this item
+     */
     private void setRect() {
         //takes into account the padding
         getDefaultTextPaint().getTextBounds(content, 0, content.length(), outline);
@@ -52,14 +73,29 @@ public class ClassDiagItem {
                 (int) x + outline.width() + DEFAULT_PADDING, (int) y + DEFAULT_PADDING);
     }
 
+    /**
+     * @return the outline of this rectangle
+     */
     public Rect getRect() {
         return outline;
     }
 
+    /**
+     * Check to see if the given coordinates are contained in this ClassDiagItem
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean contains(int x, int y) {
         return this.outline.contains(x, y);
     }
 
+    /**
+     * All ClassDiagItem will be painted with this Paint (for text)
+     *
+     * @return
+     */
     public static Paint getDefaultTextPaint() {
         if (defaultTextPaint == null) {
             defaultTextPaint = new Paint();
@@ -70,6 +106,11 @@ public class ClassDiagItem {
         return defaultTextPaint;
     }
 
+    /**
+     * All ClassDiagItem will be painted with this Paint (for the rectangle outline)
+     *
+     * @return
+     */
     public static Paint getDefaultOutlinePaint() {
         if (defaultOutlinePaint == null) {
             defaultOutlinePaint = new Paint();

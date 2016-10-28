@@ -17,6 +17,11 @@ import java.util.ArrayList;
 /**
  * Created by vishaalprasad on 10/27/16.
  */
+
+/**
+ * A View to be used inside an Activity
+ * This View will be used as the main editor for Class Diagrams
+ */
 public class ClassDiagEditorView extends View {
     private static final String TAG = "ClassDiagEditorView";
 
@@ -24,6 +29,11 @@ public class ClassDiagEditorView extends View {
     private ClassDiagItem selected = null; //null means none are selected
     private Context ctx;
 
+    /**
+     * Create a new editor view
+     * @param ctx
+     * @param attrs
+     */
     public ClassDiagEditorView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         this.ctx = ctx;
@@ -78,10 +88,15 @@ public class ClassDiagEditorView extends View {
         return null;
     }
 
+    /**
+     * prompts the user to add an Item with some String
+     * immediately adds teh view
+     */
     public void addItem() {
         Log.i(TAG, "addItem");
-        final EditText inputView = new EditText(ctx);
+        final EditText inputView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputView.setHint(R.string.class_diag_enter_title_hint);
+        //create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setTitle(R.string.class_diag_enter_title);
         builder.setView(inputView);
@@ -89,6 +104,7 @@ public class ClassDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String input = inputView.getText().toString();
+                // 100, 100 in the following line is an arbitrary point
                 selected = new ClassDiagItem(input, 100, 100); //add a new item AND select it
                 ClassItems.add(selected);
                 postInvalidate();
@@ -100,9 +116,9 @@ public class ClassDiagEditorView extends View {
                 dialog.dismiss();
             }
         });
-        builder.show();
+        builder.show(); //show the AlertDialog
 
-        postInvalidate();
+        postInvalidate(); //once we're out of the AlertDialog, force update the view 
     }
 
 }
