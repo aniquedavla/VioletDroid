@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">VioletDroid Application</string>
+
+
+    <!--Class Diagram-->
+    <string name="class_diag_enter_title">Enter Class Name</string>
+    <string name="class_diag_enter_title_hint">Class Name</string>
+
+    <!--Misc-->
+    <string name="ok_str">OK</string>
+    <string name="cancel_str">Cancel</string>
+    <string name="yes_str">No</string>
+    <string name="no_str">Yes</string>
 </resources>
