@@ -10,12 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.violetdroidapplication.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World! -- MainActivity"
-        android:id="@+id/textView" />
-
     <!--TEMP button to ClassDiagEditor-->
     <Button
         android:id="@+id/main_class_editor_button"
