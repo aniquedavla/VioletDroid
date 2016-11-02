@@ -2,11 +2,14 @@ package com.example.violetdroidapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 public class ClassDiagramEditorActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "ClassDiagditorAct";
 
     ClassDiagEditorView editorView;
     Button plusBtn;
@@ -26,7 +29,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         setViews();
     }
 
-    private void setViews(){
+    private void setViews() {
         editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
         plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
         plusBtn.setOnClickListener(this);
@@ -55,18 +58,25 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 break;
             case R.id.button1:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button2:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button3:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button4:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button5:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button6:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
             case R.id.button7:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+                break;
         }
     }
 }
