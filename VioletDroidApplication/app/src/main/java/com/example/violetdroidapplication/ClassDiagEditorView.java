@@ -4,8 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -29,6 +28,15 @@ public class ClassDiagEditorView extends View {
     private ClassDiagItem selected = null; //null means none are selected
     private Context ctx;
 
+    private int x;  // starting x-coordinate of touch
+    private int y;  // starting y-coordinate of touch
+    boolean draggable;  // whether selected item is ready to be dragged
+
+    // handles long presses
+    private Handler handler;
+    Runnable longPress;
+    boolean isLongPressed = false;
+
     /**
      * Create a new editor view
      * @param ctx
@@ -39,6 +47,16 @@ public class ClassDiagEditorView extends View {
         this.ctx = ctx;
         ClassItems = new ArrayList<>();
 
+        handler = new Handler();
+        longPress = new Runnable() {
+            public void run() {
+                isLongPressed = true;
+                if (findItem(x, y) != null) {
+                    selected = findItem(x, y);
+                }
+                Log.i("", "Long press");
+            }
+        };
     }
 
     @Override
@@ -60,17 +78,50 @@ public class ClassDiagEditorView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getActionMasked();
-        int x = Math.round(event.getX());
-        int y = Math.round(event.getY());
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+                // longPress will be called in 800 ms if not cancelled
+                handler.postDelayed(longPress, 800);
                 Log.i(TAG, "onTouchEvent: ACTION_DOWN [" + x + "," + y + "]");
-                selected = findItem(x, y);
+                x = Math.round(event.getX());
+                y = Math.round(event.getY());
+                if (findItem(x, y) != null) {
+                    if (findItem(x, y).equals(selected)) {
+                        draggable = true;
+                    }
+                }
                 break;
+
+            case MotionEvent.ACTION_UP:
+                // call to longPress cancelled (if press&hold < 800 ms)
+                handler.removeCallbacks(longPress);
+
+                // code for handling short taps
+                if (Math.abs(event.getX() - x) <= 2 && !isLongPressed) {
+                    Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap" );
+                    if (selected != null) {
+                        if (selected.equals(findItem(x, y))) {
+                            selected = null;
+                        }
+                    }
+                    return false;
+                }
+
+                Log.i(TAG, "onTouchEvent: ACTION_UP - not a tap");
+                isLongPressed = false;
+                draggable = false;
+                break;
+
             case MotionEvent.ACTION_MOVE:
-                if (selected != null)
-                    selected.set(x, y);
+                // call to longPress cancelled (if press&hold < 800 ms)
+                handler.removeCallbacks(longPress);
+                int moveX = Math.round(event.getX());
+                int moveY = Math.round(event.getY());
+                if (draggable && selected != null) {
+                    // move item by dragging
+                    selected.set(moveX, moveY);
+                }
                 break;
         }
 
