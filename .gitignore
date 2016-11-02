@@ -1,0 +1,2 @@
+#ignore everything in any folder named .idea
+*/.idea/*
