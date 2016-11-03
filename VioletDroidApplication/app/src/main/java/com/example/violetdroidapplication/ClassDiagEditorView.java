@@ -110,7 +110,6 @@ public class ClassDiagEditorView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        //canvas.drawColor(Color.WHITE);
         super.onDraw(canvas);
 
         for (ClassDiagItem item : ClassItems) {
