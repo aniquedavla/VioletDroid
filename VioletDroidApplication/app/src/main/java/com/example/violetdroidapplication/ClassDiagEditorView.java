@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -37,6 +39,15 @@ public class ClassDiagEditorView extends View {
     Runnable longPress;
     boolean isLongPressed = false;
 
+    //cell layout
+    private int numColumns, numRows;
+    private int cellWidth, cellHeight;
+    private Paint blackPaint = new Paint();
+    private boolean[][] cellChecked;
+
+    public ClassDiagEditorView(Context context) {
+        this(context, null);
+    }
     /**
      * Create a new editor view
      * @param ctx
@@ -44,6 +55,7 @@ public class ClassDiagEditorView extends View {
      */
     public ClassDiagEditorView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
+        blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
         ClassItems = new ArrayList<>();
 
@@ -59,10 +71,47 @@ public class ClassDiagEditorView extends View {
         };
     }
 
+    public void setNumColumns(int numColumns) {
+        this.numColumns = numColumns;
+        calculateDimensions();
+    }
+
+    public int getNumColumns() {
+        return numColumns;
+    }
+
+    public void setNumRows(int numRows) {
+        this.numRows = numRows;
+        calculateDimensions();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        calculateDimensions();
+    }
+
+    private void calculateDimensions() {
+        if (numColumns < 1 || numRows < 1) {
+            return;
+        }
+
+        cellWidth = getWidth() / numColumns;
+        cellHeight = getHeight() / numRows;
+
+        cellChecked = new boolean[numColumns][numRows];
+
+        invalidate();
+    }
+
+    public int getNumRows() {
+        return numRows;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
+        //canvas.drawColor(Color.WHITE);
         super.onDraw(canvas);
-
 
         for (ClassDiagItem item : ClassItems) {
             //draw the text
@@ -72,7 +121,31 @@ public class ClassDiagEditorView extends View {
             canvas.drawRect(item.getRect(), ClassDiagItem.getDefaultOutlinePaint());
         }
 
+        if (numColumns == 0 || numRows == 0) {
+            return;
+        }
 
+        int width = getWidth();
+        int height = getHeight();
+
+        for (int i = 0; i < numColumns; i++) {
+            for (int j = 0; j < numRows; j++) {
+                if (cellChecked[i][j]) {
+
+                    canvas.drawRect(i * cellWidth, j * cellHeight,
+                            (i + 1) * cellWidth, (j + 1) * cellHeight,
+                            blackPaint);
+                }
+            }
+        }
+
+        for (int i = 1; i < numColumns; i++) {
+            canvas.drawLine(i * cellWidth, 0, i * cellWidth, height, blackPaint);
+        }
+
+        for (int i = 1; i < numRows; i++) {
+            canvas.drawLine(0, i * cellHeight, width, i * cellHeight, blackPaint);
+        }
     }
 
     @Override

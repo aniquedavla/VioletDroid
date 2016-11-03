@@ -3,7 +3,9 @@ package com.example.violetdroidapplication;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -24,8 +26,18 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_class_diagram_editor);
 
+        ClassDiagEditorView pixelGrid = new ClassDiagEditorView(this);
+        pixelGrid.setNumColumns(10);
+        pixelGrid.setNumRows(20);
+        setContentView(pixelGrid);
+
+        //addContentView(R.layout.activity_class_diagram_editor,);
+        LayoutInflater inflater = getLayoutInflater();
+        getWindow().addContentView(inflater.inflate(R.layout.activity_class_diagram_editor, null),
+                new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.FILL_PARENT,
+                        ViewGroup.LayoutParams.FILL_PARENT));
         setViews();
     }
 
