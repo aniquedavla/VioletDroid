@@ -1,0 +1,21 @@
+Week 2
+
+There is some design documentation on the Wiki: No
+
+Each team member has made at least one commit: Yes
+
+Code builds on the command line, including javadoc and CheckStyle: Concern
+
+javadoc?
+
+Each issue doable in ≤ 3 days and has a single person assigned to it: Ok
+
+Make more issues so you always have a pipeline for the coming week
+
+Each team member has closed at least one issue, with # in report: Ok
+
+Each team member submitted their individual report: Ok
+
+
+
+
