@@ -28,8 +28,8 @@ public class ClassDiagItem {
     private static Paint defaultOutlinePaint;
     private static Paint defaultBgPaint;
 
-    private static final int PADDING = 20; // TODO: 11/7/16 rename to PADDING
-    private static final int TITLE_PADDING = 30; // TODO: 11/7/16 rename to PADDING
+    private static final int PADDING = 20;
+    private static final int TITLE_PADDING = 30;
 
     /**
      * Create a new ClassDiagItem
@@ -48,18 +48,6 @@ public class ClassDiagItem {
         Log.i(TAG, "ClassDiagItem: methods: " + methods);
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAttributes(String attributes) {
-        this.attributes = attributes;
-    }
-
-    public void setMethods(String methods) {
-        this.methods = methods;
-    }
-
     /**
      * Set the position (bottom left)
      *
@@ -71,37 +59,10 @@ public class ClassDiagItem {
         this.y = y;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
     /**
-     * @return the outline of this rectangle
+     * Calculate how wide this item will end up being
+     * @return the int width
      */
-    public Rect getOutline() {
-        return outline;
-    }
-
-//    public Rect getTitleOutline(){
-//
-//    }
-//
-//    public Rect getAttrsOutline(){
-//
-//    }
-//
-//    public Rect getMethodsOutline(){
-//
-//    }
-
     private int calcMaxWidth() {
         int maxWd = 0;
         for (String line : title.split("\n")) {
@@ -125,6 +86,12 @@ public class ClassDiagItem {
         return maxWd;
     }
 
+    /**
+     * Calculates how tall this item will end up being
+     * Includes the padding
+     *
+     * @return an int height
+     */
     private int calcMaxHeight() {
         float ht = (TITLE_PADDING * 2) +
                 (getDefaultTextTitlePaint().descent() - getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
@@ -136,10 +103,14 @@ public class ClassDiagItem {
         }
 
         return (int) ht;
-
     }
 
+    /**
+     * Draw this item in the given Canvas
+     * @param c
+     */
     public void draw(Canvas c) {
+        //find out how big the outermost rectangle has to be
         Rect bounds = new Rect();
         bounds.left = (int) x;
         bounds.top = (int) y;
@@ -147,27 +118,45 @@ public class ClassDiagItem {
         bounds.bottom = bounds.top + calcMaxHeight();
         this.outline = bounds;
 
+        //draw the rectangle outline
         c.drawRect(bounds, getDefaultOutlinePaint());
+        //then draw the rectangle background
         c.drawRect(bounds, getDefaultBgPaint());
 
+        //draw the title
         Rect titleBounds = new Rect();
         drawMultiLineText(title, c, getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
 
+        //horizontal line below the title
         c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
 
+        //draw the attributes
         Rect attrBounds = new Rect();
         drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
                 PADDING, attrBounds);
 
+        //horizontal line below the attributes
         c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
                 x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
                 getDefaultOutlinePaint());
 
+        //draw the methods
         Rect methodsBounds = new Rect();
         drawMultiLineText(methods, c, getDefaultTextPaint(), x,
                 y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
     }
 
+    /**
+     * Draws multiline text and sets the bounds of the text in the given bounds
+     *
+     * @param toDraw String to draw
+     * @param c Canvas on which to draw
+     * @param p Paint to use to draw text
+     * @param x coordinate to draw the text
+     * @param y coordinate to draw the text
+     * @param padding between x&y and start of text
+     * @param bounds Rect to place the bounds of the drawn text
+     */
     private void drawMultiLineText(String toDraw, Canvas c, Paint p, float x, float y, int padding, Rect bounds) {
         bounds.left = (int) x;
         bounds.top = (int) y;
