@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 public class ClassDiagramEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "ClassDiagditorAct";
+    private static final String TAG = "ClassDiagEditorAct";
 
     ClassDiagEditorView editorView;
     Button plusBtn;

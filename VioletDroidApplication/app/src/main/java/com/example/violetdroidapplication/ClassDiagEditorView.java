@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -12,6 +11,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -66,7 +67,7 @@ public class ClassDiagEditorView extends View {
                 if (findItem(x, y) != null) {
                     selected = findItem(x, y);
                 }
-                Log.i("", "Long press");
+                Log.i(TAG, "Long press");
             }
         };
     }
@@ -112,17 +113,11 @@ public class ClassDiagEditorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (ClassDiagItem item : ClassItems) {
-            //draw the text
-            canvas.drawText(item.getContent(), item.getX(), item.getY(), ClassDiagItem.getDefaultTextPaint());
+        for (ClassDiagItem item : ClassItems)
+            item.draw(canvas);
 
-            //then draw the box around it
-            canvas.drawRect(item.getRect(), ClassDiagItem.getDefaultOutlinePaint());
-        }
-
-        if (numColumns == 0 || numRows == 0) {
+        if (numColumns == 0 || numRows == 0)
             return;
-        }
 
         int width = getWidth();
         int height = getHeight();
@@ -213,22 +208,34 @@ public class ClassDiagEditorView extends View {
 
     /**
      * prompts the user to add an Item with some String
-     * immediately adds teh view
+     * immediately adds the view
      */
     public void addItem() {
         Log.i(TAG, "addItem");
-        final EditText inputView = new EditText(ctx); //this EditText will lie inside the AlertDialog
-        inputView.setHint(R.string.class_diag_enter_title_hint);
+        final LinearLayout inputHolders = new LinearLayout(ctx);
+        inputHolders.setOrientation(LinearLayout.VERTICAL);
+        final EditText inputTitleView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        inputTitleView.setHint(R.string.class_diag_enter_title_hint);
+        final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
+        final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
+        inputHolders.addView(inputTitleView);
+        inputHolders.addView(inputAttrsView);
+        inputHolders.addView(inputMethodsView);
         //create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setTitle(R.string.class_diag_enter_title);
-        builder.setView(inputView);
+        builder.setView(inputHolders);
         builder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String input = inputView.getText().toString();
+                String inputTitle = inputTitleView.getText().toString();
+                String inputAttrs = inputAttrsView.getText().toString();
+                String inputMethods = inputMethodsView.getText().toString();
+
                 // 100, 100 in the following line is an arbitrary point
-                selected = new ClassDiagItem(input, 100, 100); //add a new item AND select it
+                selected = new ClassDiagItem(inputTitle, inputAttrs, inputMethods, 100, 100); //add a new item AND select it
                 ClassItems.add(selected);
                 postInvalidate();
             }
