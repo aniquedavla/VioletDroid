@@ -27,6 +27,7 @@ public class ClassDiagItem {
     private static Paint defaultTextTitlePaint;
     private static Paint defaultOutlinePaint;
     private static Paint defaultBgPaint;
+    private static final String SELECTED_BG_PAINT = "#DBE9F9";  // color of selected item
 
     private static final int PADDING = 20;
     private static final int TITLE_PADDING = 30;
@@ -107,9 +108,10 @@ public class ClassDiagItem {
 
     /**
      * Draw this item in the given Canvas
-     * @param c
+     * @param c The canvas on which to draw
+     * @param selected Whether the item is selected
      */
-    public void draw(Canvas c) {
+    public void draw(Canvas c, boolean selected) {
         //find out how big the outermost rectangle has to be
         Rect bounds = new Rect();
         bounds.left = (int) x;
@@ -121,7 +123,7 @@ public class ClassDiagItem {
         //draw the rectangle outline
         c.drawRect(bounds, getDefaultOutlinePaint());
         //then draw the rectangle background
-        c.drawRect(bounds, getDefaultBgPaint());
+        c.drawRect(bounds, getDefaultBgPaint(selected));
 
         //draw the title
         Rect titleBounds = new Rect();
@@ -242,14 +244,18 @@ public class ClassDiagItem {
      *
      * @return
      */
-    public static Paint getDefaultBgPaint() {
+    public static Paint getDefaultBgPaint(boolean selected) {
         if (defaultBgPaint == null) {
             defaultBgPaint = new Paint();
             defaultBgPaint.setStrokeWidth(0);
             defaultBgPaint.setStyle(Paint.Style.FILL);
+        }
+        if (selected) {
+            defaultBgPaint.setColor(Color.parseColor(SELECTED_BG_PAINT));
+        }
+        else {
             defaultBgPaint.setColor(Color.WHITE);
         }
-
         return defaultBgPaint;
     }
 }
