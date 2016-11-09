@@ -5,6 +5,10 @@
     <!--Class Diagram-->
     <string name="class_diag_enter_title">Enter Class Name</string>
     <string name="class_diag_enter_title_hint">Class Name</string>
+    <string name="class_diag_enter_attrs_hint">Attributes</string>
+    <string name="class_diag_enter_methods_hint">Methods</string>
+    <string name="class_diag_err_missing_title">The Class Diagram Item must have a title that is not blank.</string>
+
 
     <!--Misc-->
     <string name="ok_str">OK</string>
