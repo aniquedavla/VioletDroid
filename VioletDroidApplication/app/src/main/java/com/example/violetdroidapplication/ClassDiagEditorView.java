@@ -65,6 +65,7 @@ public class ClassDiagEditorView extends View {
                 isLongPressed = true;
                 if (findItem(x, y) != null) {
                     selected = findItem(x, y);
+                    postInvalidate();
                 }
                 Log.i(TAG, "Long press");
             }
@@ -112,8 +113,21 @@ public class ClassDiagEditorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        for (ClassDiagItem item : ClassItems)
-            item.draw(canvas);
+        Log.i(TAG, "onDraw, selected: " + selected);
+
+        for (ClassDiagItem item : ClassItems) {
+            if (selected != null) {
+                if (selected.equals(item)) {
+                    item.draw(canvas, true);
+                }
+                else {
+                    item.draw(canvas, false);
+                }
+            }
+            else {
+                item.draw(canvas, false);
+            }
+        }
 
         if (numColumns == 0 || numRows == 0)
             return;
@@ -166,11 +180,13 @@ public class ClassDiagEditorView extends View {
                 // code for handling short taps
                 if (Math.abs(event.getX() - x) <= 2 && !isLongPressed) {
                     Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap" );
+                    // unselect item
                     if (selected != null) {
                         if (selected.equals(findItem(x, y))) {
                             selected = null;
                         }
                     }
+                    postInvalidate();
                     return false;
                 }
 
