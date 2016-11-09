@@ -61,6 +61,7 @@ public class ClassDiagItem {
 
     /**
      * Calculate how wide this item will end up being
+     *
      * @return the int width
      */
     private int calcMaxWidth() {
@@ -107,6 +108,7 @@ public class ClassDiagItem {
 
     /**
      * Draw this item in the given Canvas
+     *
      * @param c
      */
     public void draw(Canvas c) {
@@ -127,35 +129,38 @@ public class ClassDiagItem {
         Rect titleBounds = new Rect();
         drawMultiLineText(title, c, getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
 
-        //horizontal line below the title
-        c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
+        if (this.methods.length() + this.attributes.length() > 0) {
 
-        //draw the attributes
-        Rect attrBounds = new Rect();
-        drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
-                PADDING, attrBounds);
+            //horizontal line below the title
+            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
 
-        //horizontal line below the attributes
-        c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
-                x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
-                getDefaultOutlinePaint());
+            //draw the attributes
+            Rect attrBounds = new Rect();
+            drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
+                    PADDING, attrBounds);
 
-        //draw the methods
-        Rect methodsBounds = new Rect();
-        drawMultiLineText(methods, c, getDefaultTextPaint(), x,
-                y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
+            //horizontal line below the attributes
+            c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
+                    x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
+                    getDefaultOutlinePaint());
+
+            //draw the methods
+            Rect methodsBounds = new Rect();
+            drawMultiLineText(methods, c, getDefaultTextPaint(), x,
+                    y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
+        }
     }
 
     /**
      * Draws multiline text and sets the bounds of the text in the given bounds
      *
-     * @param toDraw String to draw
-     * @param c Canvas on which to draw
-     * @param p Paint to use to draw text
-     * @param x coordinate to draw the text
-     * @param y coordinate to draw the text
+     * @param toDraw  String to draw
+     * @param c       Canvas on which to draw
+     * @param p       Paint to use to draw text
+     * @param x       coordinate to draw the text
+     * @param y       coordinate to draw the text
      * @param padding between x&y and start of text
-     * @param bounds Rect to place the bounds of the drawn text
+     * @param bounds  Rect to place the bounds of the drawn text
      */
     private void drawMultiLineText(String toDraw, Canvas c, Paint p, float x, float y, int padding, Rect bounds) {
         bounds.left = (int) x;
