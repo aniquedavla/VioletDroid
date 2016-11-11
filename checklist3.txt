@@ -1,0 +1,23 @@
+Week 3
+
+Functional specification (what the project will do) is complete: Ok
+
+There is some design documentation (key classes, mechanisms, protocols): Ok
+
+Keep working on this
+
+There are sufficient issues to keep each team member busy for week 4: Partial
+
+Good number of issues, but they need to be assigned to people.
+
+Each team member has closed at least two issues and has put the closed issue number(s) in their report: No
+
+No report from Anique, Menon
+No closed issue list from Vishaal
+Not clear from Charlene's report whether those issues were worked on or closed
+
+The project builds and does something useful. Put instructions for building and for trying out that useful feature on the wiki: Partial
+
+Tell me what's working now
+
+
