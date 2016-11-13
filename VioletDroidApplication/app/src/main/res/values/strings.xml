@@ -9,10 +9,26 @@
     <string name="class_diag_enter_methods_hint">Methods</string>
     <string name="class_diag_err_missing_title">The Class Diagram Item must have a title that is not blank.</string>
 
+    <!--Saving and Loading-->
+    <string name="overwrite_dialog_title">File Already Exists</string>
+    <string name="overwrite_dialog_body">The already exists, would you like to overwrite it?</string>
+    <string name="save">Save</string>
+    <string name="save_as">Save As&#8230;</string>
+    <string name="load">Load</string>
+    <string name="save_error">Error saving. Please try again</string>
+    <string name="load_list_error">Could not load items</string>
+    <string name="load_list_empty">There are no VioletDroid items saved on your device</string>
+    <string name="load_error">Error loading. Please try again</string>
+    <string name="file_name_hint">Enter File Name</string>
+    <string name="changes_pending_dialog_title">Changes Pending</string>
+    <string name="changes_pending_dialog_body">You have unsaved changes, are you sure you want to continue?</string>
 
     <!--Misc-->
     <string name="ok_str">OK</string>
     <string name="cancel_str">Cancel</string>
-    <string name="yes_str">No</string>
     <string name="no_str">Yes</string>
+    <string name="yes_str">No</string>
+    <string name="done_str">Done</string>
+
+
 </resources>

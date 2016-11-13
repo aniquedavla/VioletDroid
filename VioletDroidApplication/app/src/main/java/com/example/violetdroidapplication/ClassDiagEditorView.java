@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -12,7 +13,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.text.FieldPosition;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +34,10 @@ import java.util.ArrayList;
 public class ClassDiagEditorView extends View {
     private static final String TAG = "ClassDiagEditorView";
 
+    //Items: everything in this block needs to be saved/loaded
     private ArrayList<ClassDiagItem> ClassItems;
+    //todo::add a list of arrows
+
     private ClassDiagItem selected = null; //null means none are selected
     private Context ctx;
 
@@ -36,8 +47,8 @@ public class ClassDiagEditorView extends View {
 
     // handles long presses
     private Handler handler;
-    Runnable longPress;
-    boolean isLongPressed = false;
+    private Runnable longPress;
+    private boolean isLongPressed = false;
 
     //cell layout
     private int numColumns, numRows;
@@ -45,11 +56,19 @@ public class ClassDiagEditorView extends View {
     private Paint blackPaint = new Paint();
     private boolean[][] cellChecked;
 
+    //saving and loading
+    private boolean savePending = false;
+    private File currentFile = null;
+    private static final String ITEMS_KEY = "items";
+    private static final String FILE_TYPE = "class_diagram";
+
     public ClassDiagEditorView(Context context) {
         this(context, null);
     }
+
     /**
      * Create a new editor view
+     *
      * @param ctx
      * @param attrs
      */
@@ -119,12 +138,10 @@ public class ClassDiagEditorView extends View {
             if (selected != null) {
                 if (selected.equals(item)) {
                     item.draw(canvas, true);
-                }
-                else {
+                } else {
                     item.draw(canvas, false);
                 }
-            }
-            else {
+            } else {
                 item.draw(canvas, false);
             }
         }
@@ -179,7 +196,7 @@ public class ClassDiagEditorView extends View {
 
                 // code for handling short taps
                 if (Math.abs(event.getX() - x) <= 2 && !isLongPressed) {
-                    Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap" );
+                    Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap");
                     // unselect item
                     if (selected != null) {
                         if (selected.equals(findItem(x, y))) {
@@ -252,6 +269,7 @@ public class ClassDiagEditorView extends View {
                 // 100, 100 in the following line is an arbitrary point
                 selected = new ClassDiagItem(inputTitle, inputAttrs, inputMethods, 100, 100); //add a new item AND select it
                 ClassItems.add(selected);
+                savePending = true;
                 postInvalidate();
             }
         });
@@ -264,6 +282,127 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
 
         postInvalidate(); //once we're out of the AlertDialog, force update the view 
+    }
+
+    private JSONObject toJson() {
+        try {
+            JSONArray arr = new JSONArray();
+            for (ClassDiagItem currItem : ClassItems)
+                arr.put(currItem.toJson());
+
+            JSONObject obj = new JSONObject();
+            obj.put(FileHelper.FILE_TYPE_KEY, FILE_TYPE);
+            obj.put(ITEMS_KEY, arr);
+
+            return obj;
+
+        } catch (Exception e) {
+            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "toArray: ", e);
+            return null;
+        }
+    }
+
+    private void loadFromFile(File f) {
+        JSONObject obj = FileHelper.getJsonFromFile(f, ctx);
+        resetSpace();
+        currentFile = f;
+        try {
+            JSONArray arr = obj.getJSONArray(ITEMS_KEY);
+
+            for (int i = 0; i < arr.length(); i++) {
+                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
+                    ClassItems.add(ClassDiagItem.fromJson(arr.getJSONObject(i)));
+                // todo::if it's an arrow then ArrowsList.add the item
+            }
+
+
+        } catch (Exception e) {
+            Log.e(TAG, "loadFromJSON: ", e);
+            Toast.makeText(ctx, R.string.load_error, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void save() {
+        if (currentFile == null) saveAs();
+        else FileHelper.checkAndSave(this.toJson(), currentFile, ctx);
+    }
+
+    public void load() {
+        if (savePending) {
+            AlertDialog.Builder changesPendingBuilder = new AlertDialog.Builder(ctx);
+            changesPendingBuilder.setTitle(R.string.changes_pending_dialog_title);
+            changesPendingBuilder.setMessage(R.string.changes_pending_dialog_body);
+            changesPendingBuilder.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    listItems();
+                }
+            });
+        } else
+            listItems();
+
+    }
+
+    public void saveAs() {
+        final JSONObject obj = this.toJson();
+        AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(ctx);
+        final EditText fileNameEditText = new EditText(ctx);
+        fileNameEditText.setHint(R.string.file_name_hint);
+        saveAsBuilder.setView(fileNameEditText);
+        saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FileHelper.checkAndSave(obj, fileNameEditText.getText().toString(), ctx);
+                savePending = false;
+            }
+        });
+        saveAsBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        saveAsBuilder.show();
+    }
+
+    public void listItems() {
+        try {
+            final File violetFiles[] = Environment.getExternalStorageDirectory().listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(FileHelper.EXTENSION);
+                }
+            });
+            final String fileNames[] = new String[violetFiles.length];
+            for (int i = 0; i < violetFiles.length; i++)
+                fileNames[i] = violetFiles[i].getName().substring(0, (int) violetFiles[i].length() - FileHelper.EXTENSION.length());
+
+            AlertDialog.Builder listBuilder = new AlertDialog.Builder(ctx);
+            listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    loadFromFile(violetFiles[which]);
+                }
+            });
+            listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(ctx, R.string.load_list_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "listLoadableItems: ", e);
+        }
+    }
+
+    /**
+     * Removes all items and "clears the working space"
+     * THIS SHOULD ONLY BE CALLED AFTER USER'S CONSENT
+     */
+    private void resetSpace() {
+        ClassItems.clear();
+        //todo::add arrowsList.clear()
     }
 
 }

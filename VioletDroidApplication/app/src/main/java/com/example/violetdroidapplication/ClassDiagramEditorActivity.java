@@ -2,7 +2,6 @@ package com.example.violetdroidapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +12,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     private static final String TAG = "ClassDiagEditorAct";
 
-    ClassDiagEditorView editorView;
-    Button plusBtn;
-    Button button1;
-    Button button2;
-    Button button3;
-    Button button4;
-    Button button5;
-    Button button6;
-    Button button7;
+    private ClassDiagEditorView editorView;
+    private Button plusBtn;
+    private Button saveBtn;
+    private Button saveAsBtn;
+    private Button loadBtn;
+    private Button button4;
+    private Button button5;
+    private Button button6;
+    private Button button7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +42,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     private void setViews() {
         editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
+
         plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
         plusBtn.setOnClickListener(this);
-
-        button1 = (Button) findViewById(R.id.button1);
-        button1.setOnClickListener(this);
-        button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(this);
-        button3 = (Button) findViewById(R.id.button3);
-        button3.setOnClickListener(this);
+        saveBtn = (Button) findViewById(R.id.class_diag_editor_save);
+        saveBtn.setOnClickListener(this);
+        saveAsBtn = (Button) findViewById(R.id.class_diag_editor_save_as);
+        saveAsBtn.setOnClickListener(this);
+        loadBtn = (Button) findViewById(R.id.class_diag_editor_load);
+        loadBtn.setOnClickListener(this);
         button4 = (Button) findViewById(R.id.button4);
         button4.setOnClickListener(this);
         button5 = (Button) findViewById(R.id.button5);
@@ -68,14 +67,14 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_plus:
                 editorView.addItem();
                 break;
-            case R.id.button1:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_save:
+                editorView.save();
                 break;
-            case R.id.button2:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_save_as:
+                editorView.saveAs();
                 break;
-            case R.id.button3:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_load:
+                editorView.load();
                 break;
             case R.id.button4:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();

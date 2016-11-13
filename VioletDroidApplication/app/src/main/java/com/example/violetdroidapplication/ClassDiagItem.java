@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 /**
  * Created by vishaalprasad on 10/27/16.
  */
@@ -110,7 +112,7 @@ public class ClassDiagItem {
     /**
      * Draw this item in the given Canvas
      *
-     * @param c The canvas on which to draw
+     * @param c        The canvas on which to draw
      * @param selected Whether the item is selected
      */
     public void draw(Canvas c, boolean selected) {
@@ -213,6 +215,11 @@ public class ClassDiagItem {
         return defaultTextTitlePaint;
     }
 
+
+    /*
+        Paint stuff:
+     */
+
     /**
      * All ClassDiagItem will be painted with this Paint (for text)
      *
@@ -255,12 +262,44 @@ public class ClassDiagItem {
             defaultBgPaint.setStrokeWidth(0);
             defaultBgPaint.setStyle(Paint.Style.FILL);
         }
-        if (selected) {
+        if (selected)
             defaultBgPaint.setColor(Color.parseColor(SELECTED_BG_PAINT));
-        }
-        else {
+        else
             defaultBgPaint.setColor(Color.WHITE);
-        }
+
         return defaultBgPaint;
+    }
+
+    /**
+     * @return a JSON representation of this ClassDiagItem
+     */
+    public JSONObject toJson() {
+        try {
+            JSONObject obj = new JSONObject();
+
+            obj.put(FileHelper.ITEM_TYPE_KEY, getClass().getName());
+            obj.put(FileHelper.LOC_X_KEY, this.x);
+            obj.put(FileHelper.LOC_Y_KEY, this.y);
+            obj.put("cdi_title", title);
+            obj.put("cdi_attrs", attributes);
+            obj.put("cdi_methods", methods);
+
+            return obj;
+
+        } catch (Exception e) {
+            Log.e(TAG, "toJson: ", e);
+            return null;
+        }
+    }
+
+    public static ClassDiagItem fromJson(JSONObject obj) {
+        try {
+            return new ClassDiagItem(obj.getString("cdi_title"), obj.getString("cdi_attrs"),
+                    obj.getString("cdi_methods"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
+                    (float) obj.getDouble(FileHelper.LOC_Y_KEY));
+        } catch (Exception e) {
+            Log.e(TAG, "fromJson: ", e);
+            return null;
+        }
     }
 }

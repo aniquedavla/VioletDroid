@@ -27,22 +27,22 @@
                 android:text="CLASS" />
 
             <Button
-                android:id="@+id/button1"
+                android:id="@+id/class_diag_editor_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1"
+                android:text="@string/save"
                 android:layout_weight="1" />
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/class_diag_editor_save_as"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2"
+                android:text="@string/save_as"
                 android:layout_weight="1"/>
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/class_diag_editor_load"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3"
+                android:text="@string/loads"
                 android:layout_weight="1"/>
 
 
