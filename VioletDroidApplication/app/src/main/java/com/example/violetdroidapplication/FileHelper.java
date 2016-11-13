@@ -1,8 +1,6 @@
 package com.example.violetdroidapplication;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;

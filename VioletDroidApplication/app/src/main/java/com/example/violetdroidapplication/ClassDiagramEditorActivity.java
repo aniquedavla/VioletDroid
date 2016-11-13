@@ -139,7 +139,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         else if (currentFile == null) //if we are not currently "working on a file" save as a new file
             saveAs();
         else if(editorView.getSavePending())
-            checkAndSave(editorView.toJson(), currentFile);
+            updateSave(); //currentFile is not null, we are currently working on an existing file
     }
 
     /**
@@ -295,6 +295,18 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      */
     public void checkAndSave(final JSONObject obj, String fileName) {
         checkAndSave(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION));
+    }
+
+    /**
+     * Update the current working file without asking the user about overwriting
+     */
+    public void updateSave(){
+        if (FileHelper.writeFile(editorView.toJson(), currentFile)) {
+            editorView.setSavePending(false);
+            Toast.makeText(this, R.string.save_successful, Toast.LENGTH_LONG).show();
+        }
+        else
+            Toast.makeText(ClassDiagramEditorActivity.this, R.string.save_error, Toast.LENGTH_LONG).show();
     }
 
     /**

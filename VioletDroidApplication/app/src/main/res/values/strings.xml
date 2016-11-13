@@ -13,6 +13,7 @@
     <string name="overwrite_dialog_title">File Already Exists</string>
     <string name="overwrite_dialog_body">The already exists, would you like to overwrite it?</string>
     <string name="save">Save</string>
+    <string name="save_successful">Save successful</string>
     <string name="save_as">Save As&#8230;</string>
     <string name="load">Load</string>
     <string name="pick_file_title">Pick a File</string>
