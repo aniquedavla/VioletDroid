@@ -1,7 +1,6 @@
 package com.example.violetdroidapplication;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -104,20 +101,28 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
+    /**
+     * loads a saved state from the given File
+     * Logs and shows a Toast when an exception is encountered
+     *
+     * @param f File with saved state to load
+     */
     private void loadFromFile(File f) {
-        editorView.setSavePending(false);
-        JSONObject obj = FileHelper.getJsonFromFile(f, this);
-        editorView.resetSpace();
-        currentFile = f;
+        JSONObject obj = FileHelper.getJsonFromFile(f, this); //create a JSONObject from the File
+        editorView.resetSpace(); //clear the view
+        currentFile = f; //this is referenced later on in saveAs
         try {
+            //get a JSONArray with all the items
             JSONArray arr = obj.getJSONArray(ClassDiagEditorView.ITEMS_KEY);
 
+            //for each item, add it to the view
             for (int i = 0; i < arr.length(); i++) {
                 if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
                     editorView.addItem(ClassDiagItem.fromJson(arr.getJSONObject(i)));
                 // todo::if it's an arrow then ArrowsList.add the item
             }
 
+            editorView.setSavePending(false); //when we load, there are no more saves pending
 
         } catch (Exception e) {
             Log.e(TAG, "loadFromJSON: ", e);
@@ -125,43 +130,49 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
+    /**
+     * Save the current state
+     */
     public void save() {
-        if(editorView.isEmpty())
+        if(editorView.isEmpty()) //if it's empty, don't save
             warnSaveEmpty();
-        else if (currentFile == null)
+        else if (currentFile == null) //if we are not currently "working on a file" save as a new file
             saveAs();
         else if(editorView.getSavePending())
-            checkAndSave(editorView.toJson(), currentFile, this);
-        else
-            return;
+            checkAndSave(editorView.toJson(), currentFile);
     }
 
+    /**
+     * Lists available items by calling listItems if there are no changes pending
+     */
     public void load() {
-        if (editorView.getSavePending()) {
+        if (editorView.getSavePending()) { // if we have changes pending then warn the user
             AlertDialog.Builder changesPendingBuilder = new AlertDialog.Builder(this);
             changesPendingBuilder.setTitle(R.string.changes_pending_dialog_title);
             changesPendingBuilder.setMessage(R.string.changes_pending_dialog_body);
             changesPendingBuilder.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    listItems();
+                    listItems(); //list the items, the pending changes will be lost
                 }
             });
             changesPendingBuilder.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+                    dialog.dismiss(); // just go back to editing
                 }
             });
             changesPendingBuilder.show();
         } else
-            listItems();
-
+            listItems(); // we don't have changes pending, just list the items
     }
 
+    /**
+     * Allow the user to pick a name for the file they're saving
+     */
     public void saveAs() {
         if(editorView.isEmpty())
-            warnSaveEmpty();
+            warnSaveEmpty(); //if the current working area is empty, warn the user and do not save anything
         else {
             final JSONObject obj = editorView.toJson();
             AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
@@ -172,8 +183,9 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    checkAndSave(obj, fileNameEditText.getText().toString(), ClassDiagramEditorActivity.this);
-                    editorView.setSavePending(false);
+                    //check if the file exists and warn the user if it does
+                    checkAndSave(obj, fileNameEditText.getText().toString());
+                    editorView.setSavePending(false); //once we've saved, we don't have changes pending
                 }
             });
             saveAsBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
@@ -186,6 +198,9 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
+    /**
+     * List the available items and allows the user to pick one to load
+     */
     public void listItems() {
         try {
             final File violetFiles[] = FileHelper.VIOLET_DROID_FOLDER.listFiles(new FilenameFilter() {
@@ -231,8 +246,14 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
-    public void checkAndSave(final JSONObject obj, File destination, final Context ctx) {
-
+    /**
+     * check if the desired file exists before saving
+     * if the file does exist, then warn the user about overwriting the file before saving
+     *
+     * @param obj to save
+     * @param destination location to save the JSONObject
+     */
+    public void checkAndSave(final JSONObject obj, File destination) {
         try {
             final File destFile = destination;
             currentFile = destFile;
@@ -240,7 +261,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             if (!destination.exists())
                 FileHelper.writeFile(obj, destFile);
             else {
-                AlertDialog.Builder overwriteWarning = new AlertDialog.Builder(ctx);
+                AlertDialog.Builder overwriteWarning = new AlertDialog.Builder(this);
                 overwriteWarning.setTitle(R.string.overwrite_dialog_title);
                 overwriteWarning.setMessage(R.string.overwrite_dialog_body);
                 overwriteWarning.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
@@ -249,7 +270,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                         if (FileHelper.writeFile(obj, destFile))
                             editorView.setSavePending(false);
                         else
-                            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
+                            Toast.makeText(ClassDiagramEditorActivity.this, R.string.save_error, Toast.LENGTH_LONG).show();
                     }
                 });
                 overwriteWarning.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
@@ -267,10 +288,18 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
-    public void checkAndSave(final JSONObject obj, String fileName, final Context ctx) {
-        checkAndSave(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION), ctx);
+    /**
+     * helper method for checkAndSave by using a file name rather a reference to a File
+     * @param obj
+     * @param fileName
+     */
+    public void checkAndSave(final JSONObject obj, String fileName) {
+        checkAndSave(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION));
     }
 
+    /**
+     * Called when the user is trying to save an empty working area
+     */
     public void warnSaveEmpty(){
         AlertDialog.Builder emptyAlert = new AlertDialog.Builder(this);
         emptyAlert.setTitle(R.string.empty_diagram_dialog_title);

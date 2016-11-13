@@ -278,11 +278,18 @@ public class ClassDiagEditorView extends View {
         postInvalidate(); //once we're out of the AlertDialog, force update the view 
     }
 
+    /**
+     * To be used when loading a saved state
+     * @param cdi
+     */
     public void addItem(ClassDiagItem cdi) {
         ClassItems.add(cdi);
         postInvalidate();
     }
 
+    /**
+     * @return true if this working area is empty, false otherwise
+     */
     public boolean isEmpty(){
         return this.ClassItems.isEmpty();
     }
@@ -306,8 +313,14 @@ public class ClassDiagEditorView extends View {
         }
     }
 
+    /**
+     * @return true if there is a change pending to be saved, false otherwise
+     */
     public boolean getSavePending(){ return savePending; }
 
+    /**
+     * @param savePending new boolean whether change is pending
+     */
     public void setSavePending(boolean savePending){
         this.savePending = savePending;
     }

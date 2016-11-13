@@ -292,6 +292,11 @@ public class ClassDiagItem {
         }
     }
 
+    /**
+     * get a ClassDiagItem from a JSONObject
+     * @param obj JSONObject representation of a ClassDiagItem
+     * @return a ClassDiagItem of the given JSONObject
+     */
     public static ClassDiagItem fromJson(JSONObject obj) {
         try {
             return new ClassDiagItem(obj.getString("cdi_title"), obj.getString("cdi_attrs"),
