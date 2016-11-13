@@ -1,8 +1,8 @@
 package com.example.violetdroidapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -105,6 +105,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     }
 
     private void loadFromFile(File f) {
+        editorView.setSavePending(false);
         JSONObject obj = FileHelper.getJsonFromFile(f, this);
         editorView.resetSpace();
         currentFile = f;
@@ -125,8 +126,14 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     }
 
     public void save() {
-        if (currentFile == null) saveAs();
-        else FileHelper.checkAndSave(editorView.toJson(), currentFile, this);
+        if(editorView.isEmpty())
+            warnSaveEmpty();
+        else if (currentFile == null)
+            saveAs();
+        else if(editorView.getSavePending())
+            checkAndSave(editorView.toJson(), currentFile, this);
+        else
+            return;
     }
 
     public void load() {
@@ -140,60 +147,140 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                     listItems();
                 }
             });
+            changesPendingBuilder.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            changesPendingBuilder.show();
         } else
             listItems();
 
     }
 
     public void saveAs() {
-        final JSONObject obj = editorView.toJson();
-        AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
-        final EditText fileNameEditText = new EditText(this);
-        fileNameEditText.setHint(R.string.file_name_hint);
-        saveAsBuilder.setView(fileNameEditText);
-        saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                FileHelper.checkAndSave(obj, fileNameEditText.getText().toString(), ClassDiagramEditorActivity.this);
-                editorView.setSavePending(false);
-            }
-        });
-        saveAsBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        saveAsBuilder.show();
+        if(editorView.isEmpty())
+            warnSaveEmpty();
+        else {
+            final JSONObject obj = editorView.toJson();
+            AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
+            final EditText fileNameEditText = new EditText(this);
+            fileNameEditText.setHint(R.string.file_name_hint);
+            saveAsBuilder.setTitle(R.string.save_as);
+            saveAsBuilder.setView(fileNameEditText);
+            saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    checkAndSave(obj, fileNameEditText.getText().toString(), ClassDiagramEditorActivity.this);
+                    editorView.setSavePending(false);
+                }
+            });
+            saveAsBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            saveAsBuilder.show();
+        }
     }
 
     public void listItems() {
         try {
-            final File violetFiles[] = Environment.getExternalStorageDirectory().listFiles(new FilenameFilter() {
+            final File violetFiles[] = FileHelper.VIOLET_DROID_FOLDER.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(FileHelper.EXTENSION);
                 }
             });
             final String fileNames[] = new String[violetFiles.length];
             for (int i = 0; i < violetFiles.length; i++)
-                fileNames[i] = violetFiles[i].getName().substring(0, (int) violetFiles[i].length() - FileHelper.EXTENSION.length());
+                fileNames[i] = violetFiles[i].getName().substring(0, violetFiles[i].getName().length() - FileHelper.EXTENSION.length());
 
-            AlertDialog.Builder listBuilder = new AlertDialog.Builder(this);
-            listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    loadFromFile(violetFiles[which]);
-                }
-            });
-            listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            if (fileNames.length > 0) {
+                AlertDialog.Builder listBuilder = new AlertDialog.Builder(this);
+                listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadFromFile(violetFiles[which]);
+                    }
+                });
+                listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                listBuilder.setTitle(R.string.pick_file_title);
+                listBuilder.show();
+            } else {
+                AlertDialog.Builder noFilesAlert = new AlertDialog.Builder(this);
+                noFilesAlert.setTitle(R.string.no_violet_items_dialog_title);
+                noFilesAlert.setMessage(R.string.no_violet_items_dialog_body);
+                noFilesAlert.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                noFilesAlert.show();
+            }
         } catch (Exception e) {
             Toast.makeText(this, R.string.load_list_error, Toast.LENGTH_LONG).show();
             Log.e(TAG, "listLoadableItems: ", e);
         }
+    }
+
+    public void checkAndSave(final JSONObject obj, File destination, final Context ctx) {
+
+        try {
+            final File destFile = destination;
+            currentFile = destFile;
+
+            if (!destination.exists())
+                FileHelper.writeFile(obj, destFile);
+            else {
+                AlertDialog.Builder overwriteWarning = new AlertDialog.Builder(ctx);
+                overwriteWarning.setTitle(R.string.overwrite_dialog_title);
+                overwriteWarning.setMessage(R.string.overwrite_dialog_body);
+                overwriteWarning.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (FileHelper.writeFile(obj, destFile))
+                            editorView.setSavePending(false);
+                        else
+                            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
+                    }
+                });
+                overwriteWarning.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); //do nothing
+                    }
+                });
+                overwriteWarning.show();
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.save_error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "saveJsonToDisk: ", e);
+        }
+    }
+
+    public void checkAndSave(final JSONObject obj, String fileName, final Context ctx) {
+        checkAndSave(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION), ctx);
+    }
+
+    public void warnSaveEmpty(){
+        AlertDialog.Builder emptyAlert = new AlertDialog.Builder(this);
+        emptyAlert.setTitle(R.string.empty_diagram_dialog_title);
+        emptyAlert.setMessage(R.string.empty_diagram_dialog_body);
+        emptyAlert.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        emptyAlert.show();
     }
 }

@@ -42,7 +42,7 @@
                 android:id="@+id/class_diag_editor_load"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/loads"
+                android:text="@string/load"
                 android:layout_weight="1"/>
 
 

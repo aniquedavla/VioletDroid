@@ -125,7 +125,7 @@ public class ClassDiagEditorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Log.i(TAG, "onDraw, selected: " + selected);
+        Log.d(TAG, "onDraw, selected: " + selected);
 
         for (ClassDiagItem item : ClassItems) {
             if (selected != null) {
@@ -211,9 +211,10 @@ public class ClassDiagEditorView extends View {
                 int moveX = Math.round(event.getX());
                 int moveY = Math.round(event.getY());
                 if (draggable && selected != null) {
-                    // move item by dragging
-                    selected.set(moveX, moveY);
+                    selected.set(moveX, moveY);  // move item by dragging
+                    savePending = true;
                 }
+
                 break;
         }
 
@@ -277,6 +278,15 @@ public class ClassDiagEditorView extends View {
         postInvalidate(); //once we're out of the AlertDialog, force update the view 
     }
 
+    public void addItem(ClassDiagItem cdi) {
+        ClassItems.add(cdi);
+        postInvalidate();
+    }
+
+    public boolean isEmpty(){
+        return this.ClassItems.isEmpty();
+    }
+
     public JSONObject toJson() {
         try {
             JSONArray arr = new JSONArray();
@@ -294,10 +304,6 @@ public class ClassDiagEditorView extends View {
             Log.e(TAG, "toArray: ", e);
             return null;
         }
-    }
-
-    public void addItem(ClassDiagItem cdi) {
-        ClassItems.add(cdi);
     }
 
     public boolean getSavePending(){ return savePending; }

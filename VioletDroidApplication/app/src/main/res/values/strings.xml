@@ -15,19 +15,23 @@
     <string name="save">Save</string>
     <string name="save_as">Save As&#8230;</string>
     <string name="load">Load</string>
+    <string name="pick_file_title">Pick a File</string>
     <string name="save_error">Error saving. Please try again</string>
     <string name="load_list_error">Could not load items</string>
-    <string name="load_list_empty">There are no VioletDroid items saved on your device</string>
     <string name="load_error">Error loading. Please try again</string>
     <string name="file_name_hint">Enter File Name</string>
     <string name="changes_pending_dialog_title">Changes Pending</string>
     <string name="changes_pending_dialog_body">You have unsaved changes, are you sure you want to continue?</string>
+    <string name="no_violet_items_dialog_title">No Saved Files</string>
+    <string name="no_violet_items_dialog_body">There are no VioletDroid files saved on your device.</string>
+    <string name="empty_diagram_dialog_title">Empty Diagram</string>
+    <string name="empty_diagram_dialog_body">Your diagram is empty. Please add items to it before saving.</string>
 
     <!--Misc-->
     <string name="ok_str">OK</string>
     <string name="cancel_str">Cancel</string>
-    <string name="no_str">Yes</string>
-    <string name="yes_str">No</string>
+    <string name="no_str">No</string>
+    <string name="yes_str">Yes</string>
     <string name="done_str">Done</string>
 
 
