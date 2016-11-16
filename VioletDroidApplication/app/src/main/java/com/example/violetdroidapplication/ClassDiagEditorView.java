@@ -12,7 +12,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +28,10 @@ import java.util.ArrayList;
 public class ClassDiagEditorView extends View {
     private static final String TAG = "ClassDiagEditorView";
 
+    //Items: everything in this block needs to be saved/loaded
     private ArrayList<ClassDiagItem> ClassItems;
+    //todo::add a list of arrows
+
     private ClassDiagItem selected = null; //null means none are selected
     private Context ctx;
 
@@ -36,8 +41,8 @@ public class ClassDiagEditorView extends View {
 
     // handles long presses
     private Handler handler;
-    Runnable longPress;
-    boolean isLongPressed = false;
+    private Runnable longPress;
+    private boolean isLongPressed = false;
 
     //cell layout
     private int numColumns, numRows;
@@ -45,11 +50,18 @@ public class ClassDiagEditorView extends View {
     private Paint blackPaint = new Paint();
     private boolean[][] cellChecked;
 
+    //saving and loading
+    private boolean savePending = false;
+    public static final String ITEMS_KEY = "items";
+    private static final String FILE_TYPE = "class_diagram";
+
     public ClassDiagEditorView(Context context) {
         this(context, null);
     }
+
     /**
      * Create a new editor view
+     *
      * @param ctx
      * @param attrs
      */
@@ -113,18 +125,16 @@ public class ClassDiagEditorView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Log.i(TAG, "onDraw, selected: " + selected);
+        Log.d(TAG, "onDraw, selected: " + selected);
 
         for (ClassDiagItem item : ClassItems) {
             if (selected != null) {
                 if (selected.equals(item)) {
                     item.draw(canvas, true);
-                }
-                else {
+                } else {
                     item.draw(canvas, false);
                 }
-            }
-            else {
+            } else {
                 item.draw(canvas, false);
             }
         }
@@ -179,7 +189,7 @@ public class ClassDiagEditorView extends View {
 
                 // code for handling short taps
                 if (Math.abs(event.getX() - x) <= 2 && !isLongPressed) {
-                    Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap" );
+                    Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap");
                     // unselect item
                     if (selected != null) {
                         if (selected.equals(findItem(x, y))) {
@@ -201,9 +211,10 @@ public class ClassDiagEditorView extends View {
                 int moveX = Math.round(event.getX());
                 int moveY = Math.round(event.getY());
                 if (draggable && selected != null) {
-                    // move item by dragging
-                    selected.set(moveX, moveY);
+                    selected.set(moveX, moveY);  // move item by dragging
+                    savePending = true;
                 }
+
                 break;
         }
 
@@ -252,6 +263,7 @@ public class ClassDiagEditorView extends View {
                 // 100, 100 in the following line is an arbitrary point
                 selected = new ClassDiagItem(inputTitle, inputAttrs, inputMethods, 100, 100); //add a new item AND select it
                 ClassItems.add(selected);
+                savePending = true;
                 postInvalidate();
             }
         });
@@ -264,6 +276,63 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
 
         postInvalidate(); //once we're out of the AlertDialog, force update the view 
+    }
+
+    /**
+     * To be used when loading a saved state
+     * @param cdi
+     */
+    public void addItem(ClassDiagItem cdi) {
+        ClassItems.add(cdi);
+        postInvalidate();
+    }
+
+    /**
+     * @return true if this working area is empty, false otherwise
+     */
+    public boolean isEmpty(){
+        return this.ClassItems.isEmpty();
+    }
+
+    public JSONObject toJson() {
+        try {
+            JSONArray arr = new JSONArray();
+            for (ClassDiagItem currItem : ClassItems)
+                arr.put(currItem.toJson());
+
+            JSONObject obj = new JSONObject();
+            obj.put(FileHelper.FILE_TYPE_KEY, FILE_TYPE);
+            obj.put(ITEMS_KEY, arr);
+
+            return obj;
+
+        } catch (Exception e) {
+            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "toArray: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * @return true if there is a change pending to be saved, false otherwise
+     */
+    public boolean getSavePending(){ return savePending; }
+
+    /**
+     * @param savePending new boolean whether change is pending
+     */
+    public void setSavePending(boolean savePending){
+        this.savePending = savePending;
+    }
+
+    /**
+     * Removes all items and "clears the working space"
+     * THIS SHOULD ONLY BE CALLED AFTER USER'S CONSENT
+     */
+    public void resetSpace() {
+        ClassItems.clear();
+        //todo::add arrowsList.clear()
+        savePending = false;
     }
 
 }

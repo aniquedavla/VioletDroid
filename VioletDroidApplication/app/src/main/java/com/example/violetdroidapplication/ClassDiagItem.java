@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 /**
  * Created by vishaalprasad on 10/27/16.
  */
@@ -62,6 +64,7 @@ public class ClassDiagItem {
 
     /**
      * Calculate how wide this item will end up being
+     *
      * @return the int width
      */
     private int calcMaxWidth() {
@@ -108,7 +111,8 @@ public class ClassDiagItem {
 
     /**
      * Draw this item in the given Canvas
-     * @param c The canvas on which to draw
+     *
+     * @param c        The canvas on which to draw
      * @param selected Whether the item is selected
      */
     public void draw(Canvas c, boolean selected) {
@@ -129,35 +133,38 @@ public class ClassDiagItem {
         Rect titleBounds = new Rect();
         drawMultiLineText(title, c, getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
 
-        //horizontal line below the title
-        c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
+        if (this.methods.length() + this.attributes.length() > 0) {
 
-        //draw the attributes
-        Rect attrBounds = new Rect();
-        drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
-                PADDING, attrBounds);
+            //horizontal line below the title
+            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
 
-        //horizontal line below the attributes
-        c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
-                x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
-                getDefaultOutlinePaint());
+            //draw the attributes
+            Rect attrBounds = new Rect();
+            drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
+                    PADDING, attrBounds);
 
-        //draw the methods
-        Rect methodsBounds = new Rect();
-        drawMultiLineText(methods, c, getDefaultTextPaint(), x,
-                y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
+            //horizontal line below the attributes
+            c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
+                    x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
+                    getDefaultOutlinePaint());
+
+            //draw the methods
+            Rect methodsBounds = new Rect();
+            drawMultiLineText(methods, c, getDefaultTextPaint(), x,
+                    y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
+        }
     }
 
     /**
      * Draws multiline text and sets the bounds of the text in the given bounds
      *
-     * @param toDraw String to draw
-     * @param c Canvas on which to draw
-     * @param p Paint to use to draw text
-     * @param x coordinate to draw the text
-     * @param y coordinate to draw the text
+     * @param toDraw  String to draw
+     * @param c       Canvas on which to draw
+     * @param p       Paint to use to draw text
+     * @param x       coordinate to draw the text
+     * @param y       coordinate to draw the text
      * @param padding between x&y and start of text
-     * @param bounds Rect to place the bounds of the drawn text
+     * @param bounds  Rect to place the bounds of the drawn text
      */
     private void drawMultiLineText(String toDraw, Canvas c, Paint p, float x, float y, int padding, Rect bounds) {
         bounds.left = (int) x;
@@ -208,6 +215,11 @@ public class ClassDiagItem {
         return defaultTextTitlePaint;
     }
 
+
+    /*
+        Paint stuff:
+     */
+
     /**
      * All ClassDiagItem will be painted with this Paint (for text)
      *
@@ -250,12 +262,49 @@ public class ClassDiagItem {
             defaultBgPaint.setStrokeWidth(0);
             defaultBgPaint.setStyle(Paint.Style.FILL);
         }
-        if (selected) {
+        if (selected)
             defaultBgPaint.setColor(Color.parseColor(SELECTED_BG_PAINT));
-        }
-        else {
+        else
             defaultBgPaint.setColor(Color.WHITE);
-        }
+
         return defaultBgPaint;
+    }
+
+    /**
+     * @return a JSON representation of this ClassDiagItem
+     */
+    public JSONObject toJson() {
+        try {
+            JSONObject obj = new JSONObject();
+
+            obj.put(FileHelper.ITEM_TYPE_KEY, getClass().getName());
+            obj.put(FileHelper.LOC_X_KEY, this.x);
+            obj.put(FileHelper.LOC_Y_KEY, this.y);
+            obj.put("cdi_title", title);
+            obj.put("cdi_attrs", attributes);
+            obj.put("cdi_methods", methods);
+
+            return obj;
+
+        } catch (Exception e) {
+            Log.e(TAG, "toJson: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * get a ClassDiagItem from a JSONObject
+     * @param obj JSONObject representation of a ClassDiagItem
+     * @return a ClassDiagItem of the given JSONObject
+     */
+    public static ClassDiagItem fromJson(JSONObject obj) {
+        try {
+            return new ClassDiagItem(obj.getString("cdi_title"), obj.getString("cdi_attrs"),
+                    obj.getString("cdi_methods"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
+                    (float) obj.getDouble(FileHelper.LOC_Y_KEY));
+        } catch (Exception e) {
+            Log.e(TAG, "fromJson: ", e);
+            return null;
+        }
     }
 }

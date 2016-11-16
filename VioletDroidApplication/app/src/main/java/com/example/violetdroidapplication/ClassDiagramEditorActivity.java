@@ -1,5 +1,7 @@
 package com.example.violetdroidapplication;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,21 +9,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class ClassDiagramEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ClassDiagEditorAct";
 
-    ClassDiagEditorView editorView;
-    Button plusBtn;
-    Button button1;
-    Button button2;
-    Button button3;
-    Button button4;
-    Button button5;
-    Button button6;
-    Button button7;
+    private File currentFile = null;
+
+    private ClassDiagEditorView editorView;
+    private Button plusBtn;
+    private Button saveBtn;
+    private Button saveAsBtn;
+    private Button loadBtn;
+    private Button button4;
+    private Button button5;
+    private Button button6;
+    private Button button7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +52,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     private void setViews() {
         editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
+
         plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
         plusBtn.setOnClickListener(this);
-
-        // change a button to delete
-        button1 = (Button) findViewById(R.id.button1);
-        button1.setOnClickListener(this);
-        button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(this);
-        button3 = (Button) findViewById(R.id.button3);
-        button3.setOnClickListener(this);
+        saveBtn = (Button) findViewById(R.id.class_diag_editor_save);
+        saveBtn.setOnClickListener(this);
+        saveAsBtn = (Button) findViewById(R.id.class_diag_editor_save_as);
+        saveAsBtn.setOnClickListener(this);
+        loadBtn = (Button) findViewById(R.id.class_diag_editor_load);
+        loadBtn.setOnClickListener(this);
         button4 = (Button) findViewById(R.id.button4);
         button4.setOnClickListener(this);
         button5 = (Button) findViewById(R.id.button5);
@@ -69,14 +77,14 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_plus:
                 editorView.addItem();
                 break;
-            case R.id.button1:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_save:
+                save();
                 break;
-            case R.id.button2:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_save_as:
+                saveAs();
                 break;
-            case R.id.button3:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_load:
+                load();
                 break;
             case R.id.button4:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
@@ -91,5 +99,229 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
                 break;
         }
+    }
+
+    /**
+     * loads a saved state from the given File
+     * Logs and shows a Toast when an exception is encountered
+     *
+     * @param f File with saved state to load
+     */
+    private void loadFromFile(File f) {
+        JSONObject obj = FileHelper.getJsonFromFile(f, this); //create a JSONObject from the File
+        editorView.resetSpace(); //clear the view
+        currentFile = f; //this is referenced later on in saveAs
+        try {
+            //get a JSONArray with all the items
+            JSONArray arr = obj.getJSONArray(ClassDiagEditorView.ITEMS_KEY);
+
+            //for each item, add it to the view
+            for (int i = 0; i < arr.length(); i++) {
+                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
+                    editorView.addItem(ClassDiagItem.fromJson(arr.getJSONObject(i)));
+                // todo::if it's an arrow then ArrowsList.add the item
+            }
+
+            editorView.setSavePending(false); //when we load, there are no more saves pending
+
+        } catch (Exception e) {
+            Log.e(TAG, "loadFromJSON: ", e);
+            Toast.makeText(this, R.string.load_error, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Save the current state
+     */
+    public void save() {
+        if(editorView.isEmpty()) //if it's empty, don't save
+            warnSaveEmpty();
+        else if (currentFile == null) //if we are not currently "working on a file" save as a new file
+            saveAs();
+        else if(editorView.getSavePending())
+            updateSave(); //currentFile is not null, we are currently working on an existing file
+    }
+
+    /**
+     * Lists available items by calling listItems if there are no changes pending
+     */
+    public void load() {
+        if (editorView.getSavePending()) { // if we have changes pending then warn the user
+            AlertDialog.Builder changesPendingBuilder = new AlertDialog.Builder(this);
+            changesPendingBuilder.setTitle(R.string.changes_pending_dialog_title);
+            changesPendingBuilder.setMessage(R.string.changes_pending_dialog_body);
+            changesPendingBuilder.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    listItems(); //list the items, the pending changes will be lost
+                }
+            });
+            changesPendingBuilder.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss(); // just go back to editing
+                }
+            });
+            changesPendingBuilder.show();
+        } else
+            listItems(); // we don't have changes pending, just list the items
+    }
+
+    /**
+     * Allow the user to pick a name for the file they're saving
+     */
+    public void saveAs() {
+        if(editorView.isEmpty())
+            warnSaveEmpty(); //if the current working area is empty, warn the user and do not save anything
+        else {
+            final JSONObject obj = editorView.toJson();
+            AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
+            final EditText fileNameEditText = new EditText(this);
+            fileNameEditText.setHint(R.string.file_name_hint);
+            saveAsBuilder.setTitle(R.string.save_as);
+            saveAsBuilder.setView(fileNameEditText);
+            saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //check if the file exists and warn the user if it does
+                    checkAndSave(obj, fileNameEditText.getText().toString());
+                    editorView.setSavePending(false); //once we've saved, we don't have changes pending
+                }
+            });
+            saveAsBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            saveAsBuilder.show();
+        }
+    }
+
+    /**
+     * List the available items and allows the user to pick one to load
+     */
+    public void listItems() {
+        try {
+            final File violetFiles[] = FileHelper.VIOLET_DROID_FOLDER.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(FileHelper.EXTENSION);
+                }
+            });
+            final String fileNames[] = new String[violetFiles.length];
+            for (int i = 0; i < violetFiles.length; i++)
+                fileNames[i] = violetFiles[i].getName().substring(0, violetFiles[i].getName().length() - FileHelper.EXTENSION.length());
+
+            if (fileNames.length > 0) {
+                AlertDialog.Builder listBuilder = new AlertDialog.Builder(this);
+                listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadFromFile(violetFiles[which]);
+                    }
+                });
+                listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                listBuilder.setTitle(R.string.pick_file_title);
+                listBuilder.show();
+            } else {
+                AlertDialog.Builder noFilesAlert = new AlertDialog.Builder(this);
+                noFilesAlert.setTitle(R.string.no_violet_items_dialog_title);
+                noFilesAlert.setMessage(R.string.no_violet_items_dialog_body);
+                noFilesAlert.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                noFilesAlert.show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.load_list_error, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "listLoadableItems: ", e);
+        }
+    }
+
+    /**
+     * check if the desired file exists before saving
+     * if the file does exist, then warn the user about overwriting the file before saving
+     *
+     * @param obj to save
+     * @param destination location to save the JSONObject
+     */
+    public void checkAndSave(final JSONObject obj, File destination) {
+        try {
+            final File destFile = destination;
+            currentFile = destFile;
+
+            if (!destination.exists())
+                FileHelper.writeFile(obj, destFile);
+            else {
+                AlertDialog.Builder overwriteWarning = new AlertDialog.Builder(this);
+                overwriteWarning.setTitle(R.string.overwrite_dialog_title);
+                overwriteWarning.setMessage(R.string.overwrite_dialog_body);
+                overwriteWarning.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (FileHelper.writeFile(obj, destFile))
+                            editorView.setSavePending(false);
+                        else
+                            Toast.makeText(ClassDiagramEditorActivity.this, R.string.save_error, Toast.LENGTH_LONG).show();
+                    }
+                });
+                overwriteWarning.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); //do nothing
+                    }
+                });
+                overwriteWarning.show();
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.save_error, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "saveJsonToDisk: ", e);
+        }
+    }
+
+    /**
+     * helper method for checkAndSave by using a file name rather a reference to a File
+     * @param obj
+     * @param fileName
+     */
+    public void checkAndSave(final JSONObject obj, String fileName) {
+        checkAndSave(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION));
+    }
+
+    /**
+     * Update the current working file without asking the user about overwriting
+     */
+    public void updateSave(){
+        if (FileHelper.writeFile(editorView.toJson(), currentFile)) {
+            editorView.setSavePending(false);
+            Toast.makeText(this, R.string.save_successful, Toast.LENGTH_LONG).show();
+        }
+        else
+            Toast.makeText(ClassDiagramEditorActivity.this, R.string.save_error, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Called when the user is trying to save an empty working area
+     */
+    public void warnSaveEmpty(){
+        AlertDialog.Builder emptyAlert = new AlertDialog.Builder(this);
+        emptyAlert.setTitle(R.string.empty_diagram_dialog_title);
+        emptyAlert.setMessage(R.string.empty_diagram_dialog_body);
+        emptyAlert.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        emptyAlert.show();
     }
 }
