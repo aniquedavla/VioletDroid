@@ -46,6 +46,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
         plusBtn.setOnClickListener(this);
 
+        // change a button to delete
         button1 = (Button) findViewById(R.id.button1);
         button1.setOnClickListener(this);
         button2 = (Button) findViewById(R.id.button2);
