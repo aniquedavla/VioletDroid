@@ -341,7 +341,11 @@ public class ClassDiagEditorView extends View {
     public void deleteItem() {
         if (selected != null) {
             ClassItems.remove(selected);
+            savePending = true; //if an item is deleted, a save is pending
+            selected = null; //now nothing is selected
+            draggable = false;
         }
+
         // TODO: delete arrows
         postInvalidate();
     }
