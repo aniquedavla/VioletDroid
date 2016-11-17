@@ -30,7 +30,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     private Button button4;
     private Button button5;
     private Button button6;
-    private Button button7;
+    private Button deleteBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +67,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         button5.setOnClickListener(this);
         button6 = (Button) findViewById(R.id.button6);
         button6.setOnClickListener(this);
-        button7 = (Button) findViewById(R.id.button7);
-        button7.setOnClickListener(this);
+        deleteBtn = (Button) findViewById(R.id.class_diag_editor_delete);
+        deleteBtn.setOnClickListener(this);
     }
 
     @Override
@@ -95,8 +95,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.button6:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
                 break;
-            case R.id.button7:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_delete:
                 break;
         }
     }

@@ -38,6 +38,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/save_as"
                 android:layout_weight="1"/>
+
             <Button
                 android:id="@+id/class_diag_editor_load"
                 android:layout_width="wrap_content"
@@ -79,10 +80,10 @@
                 android:text="6"
                 android:layout_weight="1"/>
             <Button
-                android:id="@+id/button7"
+                android:id="@+id/class_diag_editor_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7"
+                android:text="DELETE"
                 android:layout_weight="1"/>
 
 
