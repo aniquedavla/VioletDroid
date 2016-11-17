@@ -1,0 +1,23 @@
+Design documentation lists all planned classes: Partial
+
+Make some UML diagrams--a class diagram and a sequence diagram or two of the most complex scenarios
+
+
+There are sufficient issues to keep each team member busy: Ok
+
+Doesn't seem like Parvati is being assigned or closing many issues 
+
+The project builds and does something significant: Maybe
+
+It does something.
+Make a status page that shows what is working so far.
+
+Every team member has multiple commits throughout the week: No
+
+All team members should check in something several times per week
+
+Individual reports: No
+
+No reports by Anique, Parvati, 
+
+
