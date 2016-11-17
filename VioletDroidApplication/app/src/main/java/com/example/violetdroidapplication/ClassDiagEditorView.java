@@ -335,4 +335,14 @@ public class ClassDiagEditorView extends View {
         savePending = false;
     }
 
+    /**
+     * Deletes the currently selected item
+     */
+    public void deleteItem() {
+        if (selected != null) {
+            ClassItems.remove(selected);
+        }
+        // TODO: delete arrows
+        postInvalidate();
+    }
 }

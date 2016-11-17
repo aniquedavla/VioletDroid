@@ -96,6 +96,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.class_diag_editor_delete:
+                editorView.deleteItem();
                 break;
         }
     }
