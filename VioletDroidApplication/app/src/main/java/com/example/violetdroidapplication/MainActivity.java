@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Paints.initializePaints(this);
+
         // create the directory in which the violetdroid files are saved
         try {
             FileHelper.VIOLET_DROID_FOLDER.mkdir();

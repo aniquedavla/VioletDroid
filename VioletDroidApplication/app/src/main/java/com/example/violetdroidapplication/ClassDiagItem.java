@@ -1,11 +1,10 @@
 package com.example.violetdroidapplication;
 
+import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
-
 import org.json.JSONObject;
 
 /**
@@ -23,13 +22,8 @@ public class ClassDiagItem {
 
     private float x;
     private float y;
+//    private Context ctx;
     private Rect outline; //Outermost Rect that contains this item
-
-    private static Paint defaultTextPaint;
-    private static Paint defaultTextTitlePaint;
-    private static Paint defaultOutlinePaint;
-    private static Paint defaultBgPaint;
-    private static final String SELECTED_BG_PAINT = "#DBE9F9";  // color of selected item
 
     private static final int PADDING = 20;
     private static final int TITLE_PADDING = 30;
@@ -42,6 +36,7 @@ public class ClassDiagItem {
      * @param y
      */
     public ClassDiagItem(String title, String attributes, String methods, float x, float y) {
+//        this.ctx = ctx;
         this.title = title;
         this.attributes = attributes;
         this.methods = methods;
@@ -71,19 +66,19 @@ public class ClassDiagItem {
         int maxWd = 0;
         for (String line : title.split("\n")) {
             Rect temp = new Rect();
-            getDefaultTextTitlePaint().getTextBounds(line, 0, line.length(), temp);
+            Paints.getDefaultTextTitlePaint().getTextBounds(line, 0, line.length(), temp);
             if (maxWd < temp.width() + TITLE_PADDING * 2)
                 maxWd = temp.width() + TITLE_PADDING * 2;
         }
         for (String line : attributes.split("\n")) {
             Rect temp = new Rect();
-            getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
+            Paints.getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
             if (maxWd < temp.width() + PADDING * 2)
                 maxWd = temp.width() + PADDING * 2;
         }
         for (String line : methods.split("\n")) {
             Rect temp = new Rect();
-            getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
+            Paints.getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
             if (maxWd < temp.width() + PADDING * 2)
                 maxWd = temp.width() + PADDING * 2;
         }
@@ -98,12 +93,12 @@ public class ClassDiagItem {
      */
     private int calcMaxHeight() {
         float ht = (TITLE_PADDING * 2) +
-                (getDefaultTextTitlePaint().descent() - getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
+                (Paints.getDefaultTextTitlePaint().descent() - Paints.getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
 
         if (attributes.length() + methods.length() > 0) {
             ht += PADDING * 4; //twice for attributes, twice for methods (each top/bottom)
             int lineCt = attributes.split("\n").length + methods.split("\n").length;
-            ht += (getDefaultTextPaint().descent() - getDefaultTextPaint().ascent()) * lineCt;
+            ht += (Paints.getDefaultTextPaint().descent() - Paints.getDefaultTextPaint().ascent()) * lineCt;
         }
 
         return (int) ht;
@@ -125,32 +120,32 @@ public class ClassDiagItem {
         this.outline = bounds;
 
         //draw the rectangle outline
-        c.drawRect(bounds, getDefaultOutlinePaint());
+        c.drawRect(bounds, Paints.getDefaultOutlinePaint());
         //then draw the rectangle background
-        c.drawRect(bounds, getDefaultBgPaint(selected));
+        c.drawRect(bounds, Paints.getDefaultBgPaint(selected));
 
         //draw the title
         Rect titleBounds = new Rect();
-        drawMultiLineText(title, c, getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
+        drawMultiLineText(title, c, Paints.getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
 
         if (this.methods.length() + this.attributes.length() > 0) {
 
             //horizontal line below the title
-            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), getDefaultOutlinePaint());
+            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), Paints.getDefaultOutlinePaint());
 
             //draw the attributes
             Rect attrBounds = new Rect();
-            drawMultiLineText(attributes, c, getDefaultTextPaint(), x, y + titleBounds.height(),
+            drawMultiLineText(attributes, c, Paints.getDefaultTextPaint(), x, y + titleBounds.height(),
                     PADDING, attrBounds);
 
             //horizontal line below the attributes
             c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
                     x + bounds.width(), y + titleBounds.height() + attrBounds.height(),
-                    getDefaultOutlinePaint());
+                    Paints.getDefaultOutlinePaint());
 
             //draw the methods
             Rect methodsBounds = new Rect();
-            drawMultiLineText(methods, c, getDefaultTextPaint(), x,
+            drawMultiLineText(methods, c, Paints.getDefaultTextPaint(), x,
                     y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
         }
     }
@@ -201,76 +196,6 @@ public class ClassDiagItem {
     }
 
     /**
-     * All ClassDiagItem will be painted with this Paint (for the Title)
-     *
-     * @return
-     */
-    public static Paint getDefaultTextTitlePaint() {
-        if (defaultTextTitlePaint == null) {
-            defaultTextTitlePaint = new Paint();
-            defaultTextTitlePaint.setStyle(Paint.Style.FILL);
-            defaultTextTitlePaint.setTextSize(42);
-        }
-
-        return defaultTextTitlePaint;
-    }
-
-
-    /*
-        Paint stuff:
-     */
-
-    /**
-     * All ClassDiagItem will be painted with this Paint (for text)
-     *
-     * @return
-     */
-    public static Paint getDefaultTextPaint() {
-        if (defaultTextPaint == null) {
-            defaultTextPaint = new Paint();
-            defaultTextPaint.setStyle(Paint.Style.FILL);
-            defaultTextPaint.setTextSize(34);
-        }
-
-        return defaultTextPaint;
-    }
-
-    /**
-     * All ClassDiagItem will be painted with this Paint (for the rectangle outline)
-     *
-     * @return
-     */
-    public static Paint getDefaultOutlinePaint() {
-        if (defaultOutlinePaint == null) {
-            defaultOutlinePaint = new Paint();
-            defaultOutlinePaint.setStrokeWidth(3);
-            defaultOutlinePaint.setStyle(Paint.Style.STROKE);
-            defaultOutlinePaint.setColor(Color.BLACK);
-        }
-
-        return defaultOutlinePaint;
-    }
-
-    /**
-     * All ClassDiagItem will be painted with this Paint (for the rectangle background)
-     *
-     * @return
-     */
-    public static Paint getDefaultBgPaint(boolean selected) {
-        if (defaultBgPaint == null) {
-            defaultBgPaint = new Paint();
-            defaultBgPaint.setStrokeWidth(0);
-            defaultBgPaint.setStyle(Paint.Style.FILL);
-        }
-        if (selected)
-            defaultBgPaint.setColor(Color.parseColor(SELECTED_BG_PAINT));
-        else
-            defaultBgPaint.setColor(Color.WHITE);
-
-        return defaultBgPaint;
-    }
-
-    /**
      * @return a JSON representation of this ClassDiagItem
      */
     public JSONObject toJson() {
@@ -307,4 +232,5 @@ public class ClassDiagItem {
             return null;
         }
     }
+
 }
