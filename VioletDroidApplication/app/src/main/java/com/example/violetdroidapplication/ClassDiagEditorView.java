@@ -267,8 +267,6 @@ public class ClassDiagEditorView extends View {
             inputAttrsView.setText(selected.getAttributes());
             inputMethodsView.setText(selected.getMethods());
             inputTitleView.selectAll();
-            inputAttrsView.selectAll();
-            inputMethodsView.selectAll();
         }
 
         inputHolders.addView(inputTitleView);
@@ -307,8 +305,6 @@ public class ClassDiagEditorView extends View {
             }
         });
         builder.show(); //show the AlertDialog
-
-//        postInvalidate(); //once we're out of the AlertDialog, force update the view
     }
 
     /**

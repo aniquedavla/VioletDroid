@@ -351,6 +351,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             exportImgDialogBuilder.setTitle(R.string.export_dialog_title);
             final EditText fileNameEditText = new EditText(this);
             fileNameEditText.setHint(R.string.file_name_hint);
+            fileNameEditText.setSingleLine();
             //if we are currently working on a file, set the text to that file's name
             if (this.currentFile != null)
                 fileNameEditText.setText(currentFile.getName().substring(0,
