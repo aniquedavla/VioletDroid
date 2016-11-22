@@ -355,6 +355,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             if (this.currentFile != null)
                 fileNameEditText.setText(currentFile.getName().substring(0,
                         currentFile.getName().length() - FileHelper.EXTENSION.length()));
+            fileNameEditText.selectAll();
             exportImgDialogBuilder.setView(fileNameEditText);
             exportImgDialogBuilder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
                 @Override
