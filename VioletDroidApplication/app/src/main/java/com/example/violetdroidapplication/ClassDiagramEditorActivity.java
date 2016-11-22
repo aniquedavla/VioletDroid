@@ -107,6 +107,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_delete:
                 editorView.deleteItem();
                 break;
+            default:
+                break;
         }
     }
 
@@ -257,7 +259,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             if (violetFiles != null && violetFiles.length > 0) {
                 final String fileNames[] = new String[violetFiles.length];
                 for (int i = 0; i < violetFiles.length; i++)
-                    fileNames[i] = violetFiles[i].getName().substring(0, violetFiles[i].getName().length() - FileHelper.EXTENSION.length());
+                    fileNames[i] = violetFiles[i].getName().substring(0, violetFiles[i].getName().length()
+                            - FileHelper.EXTENSION.length());
                 AlertDialog.Builder listBuilder = new AlertDialog.Builder(this);
 
                 listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
@@ -322,7 +325,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * @param fileName name for the File
      */
     public void checkAndSaveJson(final JSONObject obj, String fileName) {
-        checkAndSaveJson(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION));
+        checkAndSaveJson(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/"
+                + fileName + FileHelper.EXTENSION));
     }
 
     /**
@@ -380,7 +384,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      *
      * @param toWrite           contents the user wants to save
      * @param destFile          where the user wants to save the contents
-     * @param updateSavePending update the editorView's savePending boolean, should be true for vdroid files, false for images
+     * @param updateSavePending update the editorView's savePending boolean,
+     *                          should be true for vdroid files, false for images
      */
     private void warnOverwrite(final Object toWrite, final File destFile, final boolean updateSavePending) {
         AlertDialog.Builder overwriteWarning = new AlertDialog.Builder(this);
@@ -413,8 +418,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         Bitmap img = editorView.getBitmap();
 
         File destFile = new File(FileHelper.PICTURES_FOLDER, fileName + FileHelper.IMG_EXTENSION);
-        if (destFile.exists())
-            warnOverwrite(img, destFile, false); //because we're saving this file as an image, we don't want to update the editorView's
+        if (destFile.exists()) //because we're saving this file as an image, we don't want to update the editorView's
+            warnOverwrite(img, destFile, false);
         else
             FileHelper.writeFile(img, destFile, this);
     }
@@ -429,8 +434,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             AlertDialog.Builder resetAreaDialog = new AlertDialog.Builder(this);
             resetAreaDialog.setTitle(R.string.new_class_diagram_dialog_title);
             //the message is dependent on if unsaved changes are present
-            resetAreaDialog.setMessage(editorView.getSavePending() ? R.string.changes_pending_dialog_body :
-                    R.string.new_class_diagram_dialod_body);
+            resetAreaDialog.setMessage(editorView.getSavePending() ? R.string.changes_pending_dialog_body
+                                                                   : R.string.new_class_diagram_dialod_body);
             resetAreaDialog.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
