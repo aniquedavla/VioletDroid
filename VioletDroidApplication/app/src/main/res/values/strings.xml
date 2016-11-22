@@ -4,6 +4,7 @@
 
     <!--Class Diagram-->
     <string name="class_diag_enter_title">Enter Class Information</string>
+    <string name="class_diag_edit_title">Edit Class Information</string>
     <string name="class_diag_enter_title_hint">Class Name</string>
     <string name="class_diag_enter_attrs_hint">Attributes</string>
     <string name="class_diag_enter_methods_hint">Methods</string>

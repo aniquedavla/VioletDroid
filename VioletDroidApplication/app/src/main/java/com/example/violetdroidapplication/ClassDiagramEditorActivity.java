@@ -84,7 +84,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.class_diag_editor_plus:
-                editorView.addItem();
+                editorView.addOrEditItem();
                 break;
             case R.id.class_diag_editor_save:
                 save();
@@ -220,7 +220,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
             final EditText fileNameEditText = new EditText(this);
             fileNameEditText.setHint(R.string.file_name_hint);
-            fileNameEditText.setMaxLines(1);
+            fileNameEditText.setSingleLine();
             saveAsBuilder.setTitle(R.string.save_as);
             saveAsBuilder.setView(fileNameEditText);
             saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {

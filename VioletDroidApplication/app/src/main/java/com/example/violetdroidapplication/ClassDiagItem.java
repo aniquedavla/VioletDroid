@@ -56,6 +56,40 @@ public class ClassDiagItem {
     }
 
     /**
+     * One setter method that handles setting the text contents of this ClassDiagItem
+     *
+     * @param title the new title
+     * @param attrs the new list of attributes
+     * @param methods the new list of methods
+     */
+    public void setTexts(String title, String attrs, String methods){
+        this.title = title;
+        this.attributes = attrs;
+        this.methods = methods;
+    }
+
+    /**
+     * @return the title contained in this ClassDiagItem
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @return the list of attributes contained in this ClassDiagItem
+     */
+    public String getAttributes() {
+        return attributes;
+    }
+
+    /**
+     * @return the list of methods contained in this ClassDiagItem
+     */
+    public String getMethods() {
+        return methods;
+    }
+
+    /**
      * Calculate how wide this item will end up being
      *
      * @return the int width

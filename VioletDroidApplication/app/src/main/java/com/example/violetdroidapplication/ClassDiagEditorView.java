@@ -241,38 +241,62 @@ public class ClassDiagEditorView extends View {
     }
 
     /**
-     * prompts the user to add an Item with some String
-     * immediately adds the view
+     * If a ClassDiagItem is already selected, this method will edit its attributes
+     * Prompts the user to input attributes
+     * Immediately updates the view by redrawing
      */
-    public void addItem() {
-        Log.i(TAG, "addItem");
+    public void addOrEditItem() {
+        Log.d(TAG, "addOrEditItem");
+
+        //we are editing an item if we already have one selected
+        final boolean editingItem = (selected != null && selected instanceof ClassDiagItem); //later on selected can be an arrow
+
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
         final EditText inputTitleView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputTitleView.setHint(R.string.class_diag_enter_title_hint);
-        inputTitleView.setMaxLines(1);
+        inputTitleView.setSingleLine();
         final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
         final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
+
+        //if we're editing an item, populate the dialog with the current contents
+        if(editingItem){
+            inputTitleView.setText(selected.getTitle());
+            inputAttrsView.setText(selected.getAttributes());
+            inputMethodsView.setText(selected.getMethods());
+            inputTitleView.selectAll();
+            inputAttrsView.selectAll();
+            inputMethodsView.selectAll();
+        }
+
         inputHolders.addView(inputTitleView);
         inputHolders.addView(inputAttrsView);
         inputHolders.addView(inputMethodsView);
         //create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-        builder.setTitle(R.string.class_diag_enter_title);
+        builder.setTitle(editingItem ? R.string.class_diag_edit_title
+                                     : R.string.class_diag_enter_title);
         builder.setView(inputHolders);
         builder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String inputTitle = inputTitleView.getText().toString();
-                String inputAttrs = inputAttrsView.getText().toString();
-                String inputMethods = inputMethodsView.getText().toString();
+                if(editingItem) { //if we're editing an item, just update the contents
+                    selected.setTexts(inputTitleView.getText().toString(),
+                            inputAttrsView.getText().toString(),
+                            inputMethodsView.getText().toString());
+                } else {
+                    // we are creating a new item
 
-                // 100, 100 in the following line is an arbitrary point
-                selected = new ClassDiagItem(inputTitle, inputAttrs, inputMethods, 100, 100); //add a new item AND select it
-                ClassItems.add(selected);
-                savePending = true;
+                    // 100, 100 in the following line is an arbitrary point
+                    selected = new ClassDiagItem(inputTitleView.getText().toString(),
+                            inputAttrsView.getText().toString(),
+                            inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
+                    ClassItems.add(selected);
+                }
+
+                savePending = true; //we've made changes to the editor
                 postInvalidate();
             }
         });
@@ -284,7 +308,7 @@ public class ClassDiagEditorView extends View {
         });
         builder.show(); //show the AlertDialog
 
-        postInvalidate(); //once we're out of the AlertDialog, force update the view 
+//        postInvalidate(); //once we're out of the AlertDialog, force update the view
     }
 
     /**
