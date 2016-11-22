@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,16 +16,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.initialize();
+
+    }
+
+    private void initialize() {
         Paints.initializePaints(this);
 
-        // create the directory in which the violetdroid files are saved
-        try {
-            FileHelper.VIOLET_DROID_FOLDER.mkdir();
-        } catch (Exception e){
-            Toast.makeText(this, "Error making violetDriod directory", Toast.LENGTH_LONG);
-            Log.e(TAG, "onCreate: ", e);
-        }
-
+        FileHelper.initializeFiles();
 
         ((Button) findViewById(R.id.main_class_editor_button)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(editorIntent);
             }
         });
+
 
 
     }

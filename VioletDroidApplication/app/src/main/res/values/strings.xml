@@ -15,9 +15,15 @@
     <string name="save">Save</string>
     <string name="save_successful">Save successful</string>
     <string name="save_as">Save As&#8230;</string>
+    <string name="save_error">Error saving. Please try again</string>
+
+    <string name="export">Export</string>
+    <string name="export_dialog_title">Export Image</string>
+    <string name="export_dialog_body">Enter a name for the image.</string>
+    <string name="export_success_toast">Image saved to your gallery.</string>
+
     <string name="load">Load</string>
     <string name="pick_file_title">Pick a File</string>
-    <string name="save_error">Error saving. Please try again</string>
     <string name="load_list_error">Could not load items</string>
     <string name="load_error">Error loading. Please try again</string>
     <string name="file_name_hint">Enter File Name</string>

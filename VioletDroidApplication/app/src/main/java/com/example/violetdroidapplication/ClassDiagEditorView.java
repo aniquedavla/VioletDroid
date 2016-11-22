@@ -3,8 +3,11 @@ package com.example.violetdroidapplication;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,8 +16,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -280,6 +285,7 @@ public class ClassDiagEditorView extends View {
 
     /**
      * To be used when loading a saved state
+     *
      * @param cdi
      */
     public void addItem(ClassDiagItem cdi) {
@@ -290,7 +296,7 @@ public class ClassDiagEditorView extends View {
     /**
      * @return true if this working area is empty, false otherwise
      */
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return this.ClassItems.isEmpty();
     }
 
@@ -307,8 +313,8 @@ public class ClassDiagEditorView extends View {
             return obj;
 
         } catch (Exception e) {
-            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
             Log.e(TAG, "toArray: ", e);
+            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
             return null;
         }
     }
@@ -316,12 +322,14 @@ public class ClassDiagEditorView extends View {
     /**
      * @return true if there is a change pending to be saved, false otherwise
      */
-    public boolean getSavePending(){ return savePending; }
+    public boolean getSavePending() {
+        return savePending;
+    }
 
     /**
      * @param savePending new boolean whether change is pending
      */
-    public void setSavePending(boolean savePending){
+    public void setSavePending(boolean savePending) {
         this.savePending = savePending;
     }
 
@@ -349,4 +357,17 @@ public class ClassDiagEditorView extends View {
         // TODO: delete arrows
         postInvalidate();
     }
+
+    public Bitmap getBitmap() {
+        Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        Drawable bgDrawable = this.getBackground();
+        if (bgDrawable != null)
+            bgDrawable.draw(canvas);
+        else
+            canvas.drawColor(Color.WHITE);
+        this.draw(canvas);
+        return result;
+    }
+
 }
