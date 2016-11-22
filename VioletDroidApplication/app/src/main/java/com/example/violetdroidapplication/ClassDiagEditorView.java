@@ -250,6 +250,7 @@ public class ClassDiagEditorView extends View {
         inputHolders.setOrientation(LinearLayout.VERTICAL);
         final EditText inputTitleView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputTitleView.setHint(R.string.class_diag_enter_title_hint);
+        inputTitleView.setMaxLines(1);
         final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
         final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
@@ -342,8 +343,11 @@ public class ClassDiagEditorView extends View {
      */
     public void resetSpace() {
         ClassItems.clear();
+        selected = null;
+
         //todo::add arrowsList.clear()
         savePending = false;
+        postInvalidate();
     }
 
     /**

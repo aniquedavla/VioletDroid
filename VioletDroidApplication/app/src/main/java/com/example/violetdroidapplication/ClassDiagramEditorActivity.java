@@ -34,7 +34,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     private Button saveAsBtn;
     private Button loadBtn;
     private Button exportBtn;
-    private Button button5;
+    private Button newBtn;
     private Button button6;
     private Button deleteBtn;
 
@@ -70,11 +70,11 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         saveAsBtn.setOnClickListener(this);
         loadBtn = (Button) findViewById(R.id.class_diag_editor_load);
         loadBtn.setOnClickListener(this);
-        exportBtn = (Button) findViewById(R.id.export);
+        exportBtn = (Button) findViewById(R.id.class_diag_editor_export);
         exportBtn.setOnClickListener(this);
-        button5 = (Button) findViewById(R.id.button5);
-        button5.setOnClickListener(this);
-        button6 = (Button) findViewById(R.id.button6);
+        newBtn = (Button) findViewById(R.id.class_diag_editor_new);
+        newBtn.setOnClickListener(this);
+        button6 = (Button) findViewById(R.id.class_diag_editor_button6);
         button6.setOnClickListener(this);
         deleteBtn = (Button) findViewById(R.id.class_diag_editor_delete);
         deleteBtn.setOnClickListener(this);
@@ -95,13 +95,13 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_load:
                 load();
                 break;
-            case R.id.export:
+            case R.id.class_diag_editor_export:
                 exportPrompt();
                 break;
-            case R.id.button5:
-                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
+            case R.id.class_diag_editor_new:
+                newWorkingArea();
                 break;
-            case R.id.button6:
+            case R.id.class_diag_editor_button6:
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.class_diag_editor_delete:
@@ -219,6 +219,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
             final EditText fileNameEditText = new EditText(this);
             fileNameEditText.setHint(R.string.file_name_hint);
+            fileNameEditText.setMaxLines(1);
             saveAsBuilder.setTitle(R.string.save_as);
             saveAsBuilder.setView(fileNameEditText);
             saveAsBuilder.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
@@ -413,7 +414,36 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             warnOverwrite(img, destFile, false); //because we're saving this file as an image, we don't want to update the editorView's
         else
             FileHelper.writeFile(img, destFile, this);
-
     }
 
+    /**
+     * Prompt the user if they want to reset the working area
+     */
+    private void newWorkingArea() {
+        //only show the dialog if it makes sense to do so
+        if (currentFile != null || !editorView.isEmpty()) {
+
+            AlertDialog.Builder resetAreaDialog = new AlertDialog.Builder(this);
+            resetAreaDialog.setTitle(R.string.new_class_diagram_dialog_title);
+            //the message is dependent on if unsaved changes are present
+            resetAreaDialog.setMessage(editorView.getSavePending() ? R.string.changes_pending_dialog_body :
+                    R.string.new_class_diagram_dialod_body);
+            resetAreaDialog.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss(); //do nothing, the user hit "no"
+                }
+            });
+            resetAreaDialog.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //reset the working area
+                    editorView.setSavePending(false);
+                    editorView.resetSpace();
+                    currentFile = null;
+                }
+            });
+            resetAreaDialog.show();
+        }
+    }
 }
