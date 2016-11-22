@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class ClassDiagEditorView extends View {
     private static final String TAG = "ClassDiagEditorView";
 
-    //Items: everything in this block needs to be saved/loaded
+    //Items: everything here needs to be saved/loaded
     private ArrayList<ClassDiagItem> ClassItems;
     //todo::add a list of arrows
 
@@ -60,6 +60,9 @@ public class ClassDiagEditorView extends View {
     public static final String ITEMS_KEY = "items";
     private static final String FILE_TYPE = "class_diagram";
 
+    /**
+     * @param context of this application
+     */
     public ClassDiagEditorView(Context context) {
         this(context, null);
     }
@@ -67,8 +70,8 @@ public class ClassDiagEditorView extends View {
     /**
      * Create a new editor view
      *
-     * @param ctx
-     * @param attrs
+     * @param ctx   of this application
+     * @param attrs attributes used to create this View
      */
     public ClassDiagEditorView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
@@ -358,6 +361,9 @@ public class ClassDiagEditorView extends View {
         postInvalidate();
     }
 
+    /**
+     * @return a Bitmap object containing this View's items
+     */
     public Bitmap getBitmap() {
         Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);

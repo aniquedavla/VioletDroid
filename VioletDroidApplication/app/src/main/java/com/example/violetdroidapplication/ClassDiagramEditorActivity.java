@@ -19,6 +19,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FilenameFilter;
 
+/**
+ * Contains a ClassDiagEditorView and buttons to allow the user to create class diagrams
+ */
 public class ClassDiagramEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ClassDiagEditorAct";
@@ -53,6 +56,9 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         setViews();
     }
 
+    /**
+     * initialize the views in this Activity
+     */
     private void setViews() {
         editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
 
@@ -110,7 +116,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      */
     @Override
     public void onBackPressed() {
-        if(editorView.getSavePending()){
+        if (editorView.getSavePending()) {
             AlertDialog.Builder unsavedChangesDialog = new AlertDialog.Builder(this);
             unsavedChangesDialog.setTitle(R.string.changes_pending_dialog_title);
             unsavedChangesDialog.setMessage(R.string.changes_pending_dialog_body);
@@ -132,12 +138,12 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     }
 
 
-        /**
-         * loads a saved state from the given File
-         * Logs and shows a Toast when an exception is encountered
-         *
-         * @param f File with saved state to load
-         */
+    /**
+     * loads a saved state from the given File
+     * Logs and shows a Toast when an exception is encountered
+     *
+     * @param f File with saved state to load
+     */
     private void loadFromFile(File f) {
         JSONObject obj = FileHelper.getJsonFromFile(f, this); //create a JSONObject from the File
         editorView.resetSpace(); //clear the view
@@ -238,13 +244,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      */
     public void listItems() {
         try {
+            //get all the .vdroid files from the directory
             final File violetFiles[] = FileHelper.VIOLET_DROID_FOLDER.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(FileHelper.EXTENSION.toLowerCase());
                 }
             });
 
-            if (violetFiles.length > 0 && violetFiles != null) {
+            //if there are files to list, show them and ask the user to pick one
+            if (violetFiles != null && violetFiles.length > 0) {
                 final String fileNames[] = new String[violetFiles.length];
                 for (int i = 0; i < violetFiles.length; i++)
                     fileNames[i] = violetFiles[i].getName().substring(0, violetFiles[i].getName().length() - FileHelper.EXTENSION.length());
@@ -253,19 +261,19 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadFromFile(violetFiles[which]);
+                        loadFromFile(violetFiles[which]); //when one is selected, load it
                     }
                 });
                 listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                        dialog.dismiss(); //the user hit "cancel"
                     }
                 });
                 listBuilder.setTitle(R.string.pick_file_title);
-                listBuilder.show();
+                listBuilder.show(); //show this dialog
             } else {
-                //there are no violet files on the device, warn the user
+                //there are no violet files on the device, let the user know
                 AlertDialog.Builder noFilesAlert = new AlertDialog.Builder(this);
                 noFilesAlert.setTitle(R.string.no_violet_items_dialog_title);
                 noFilesAlert.setMessage(R.string.no_violet_items_dialog_body);
@@ -287,7 +295,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * check if the desired file exists before saving
      * if the file does exist, then warn the user about overwriting the file before saving
      *
-     * @param obj      to save
+     * @param obj      contents to save
      * @param destFile location to save the JSONObject
      */
     public void checkAndSaveJson(final JSONObject obj, final File destFile) {
@@ -296,7 +304,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
             if (!destFile.exists())
                 FileHelper.writeFile(obj, destFile, this);
-            else
+            else //the file already exists, warn the user that it will be overwritten
                 warnOverwrite(obj, destFile, true);
         } catch (Exception e) {
             Toast.makeText(this, R.string.save_error, Toast.LENGTH_SHORT).show();
@@ -308,8 +316,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * helper method for checkAndSaveJson
      * Can pass a String instead of a File
      *
-     * @param obj
-     * @param fileName
+     * @param obj      contents to save
+     * @param fileName name for the File
      */
     public void checkAndSaveJson(final JSONObject obj, String fileName) {
         checkAndSaveJson(obj, new File(FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "/" + fileName + FileHelper.EXTENSION));
@@ -317,6 +325,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     /**
      * Called when the user is trying to save an empty working area
+     * Just lets the user know that nothing will be done with an empty working area
      */
     public void warnSaveEmpty() {
         AlertDialog.Builder emptyAlert = new AlertDialog.Builder(this);
@@ -332,10 +341,10 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     }
 
     /**
-     * Prompt the user for a filename to use when saving the image
+     * Prompt the user for a filename to use when saving the working area as an image
      */
     public void exportPrompt() {
-        if(!editorView.isEmpty()) {
+        if (!editorView.isEmpty()) { //continue if it's not empty
             AlertDialog.Builder exportImgDialogBuilder = new AlertDialog.Builder(this);
             exportImgDialogBuilder.setTitle(R.string.export_dialog_title);
             final EditText fileNameEditText = new EditText(this);
@@ -358,7 +367,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 }
             });
             exportImgDialogBuilder.show();
-        } else
+        } else //the working area is empty, let the user know & do nothing else
             warnSaveEmpty();
     }
 

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Created by vishaalprasad on 11/12/16.
+ * Use to manage Files, i.e. saving and loading
  */
 public class FileHelper {
     private static final String TAG = "FileHelper";
@@ -34,7 +34,7 @@ public class FileHelper {
      * Will overwrite if the file already exists
      *
      * @param obj contents to sv
-     * @param f location to save the object
+     * @param f   location to save the object
      * @param ctx used to throw toast
      * @return true if save was successful, false otherwise
      */

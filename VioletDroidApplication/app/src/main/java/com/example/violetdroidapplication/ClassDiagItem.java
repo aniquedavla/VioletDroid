@@ -1,10 +1,10 @@
 package com.example.violetdroidapplication;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
+
 import org.json.JSONObject;
 
 /**
@@ -22,7 +22,6 @@ public class ClassDiagItem {
 
     private float x;
     private float y;
-//    private Context ctx;
     private Rect outline; //Outermost Rect that contains this item
 
     private static final int PADDING = 20;
@@ -36,7 +35,6 @@ public class ClassDiagItem {
      * @param y
      */
     public ClassDiagItem(String title, String attributes, String methods, float x, float y) {
-//        this.ctx = ctx;
         this.title = title;
         this.attributes = attributes;
         this.methods = methods;
@@ -219,6 +217,7 @@ public class ClassDiagItem {
 
     /**
      * get a ClassDiagItem from a JSONObject
+     *
      * @param obj JSONObject representation of a ClassDiagItem
      * @return a ClassDiagItem of the given JSONObject
      */

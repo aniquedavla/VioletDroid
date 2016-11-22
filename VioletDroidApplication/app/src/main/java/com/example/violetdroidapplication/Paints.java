@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.util.TypedValue;
 
 /**
- * Created by vishaalprasad on 11/17/16.
+ * Used to manage Paint objects
  */
 public class Paints {
 
@@ -72,7 +72,8 @@ public class Paints {
 
     /**
      * convert Px to Dp
-     * @param px a number in pixels unit
+     *
+     * @param px  a number in pixels unit
      * @param ctx Context used to calculate the conversion
      * @return px represented as dp for this device
      */
