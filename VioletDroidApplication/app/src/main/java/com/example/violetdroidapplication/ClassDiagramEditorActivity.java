@@ -134,7 +134,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 }
             });
             unsavedChangesDialog.show();
-        }
+        } else
+            super.onBackPressed();
     }
 
 
