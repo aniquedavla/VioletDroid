@@ -8,17 +8,23 @@ import android.util.TypedValue;
 /**
  * Used to manage Paint objects
  */
-public class Paints {
+public final class Paints {
 
-    public static Paint defaultTextPaint;
-    public static Paint defaultTextTitlePaint;
-    public static Paint defaultOutlinePaint;
-    public static Paint defaultBgPaint;
+    private static Paint defaultTextPaint;
+    private static Paint defaultTextTitlePaint;
+    private static Paint defaultOutlinePaint;
+    private static Paint defaultBgPaint;
 
-    private static int SELECTED_BG_PAINT = Color.parseColor("#DBE9F9");  // color of selected item
+    private static final int SELECTED_BG_PAINT = Color.parseColor("#DBE9F9");  // color of selected item
+
+    /**
+     * Private constructor to make checkstyle happy
+     */
+    private Paints() { }
 
     /**
      * Call this in the MainActivity, sets all the Paint objects to be used later on
+     * @param ctx Context of the application
      */
     public static void initializePaints(Context ctx) {
         defaultTextTitlePaint = new Paint();

@@ -18,21 +18,25 @@ import org.json.JSONObject;
 public class ClassDiagItem {
     private static final String TAG = "ClassDiagItem";
 
-    private String title, attributes, methods;
+    private static final int PADDING = 20;
+    private static final int TITLE_PADDING = 30;
+
+    private String title;
+    private String attributes;
+    private String methods;
 
     private float x;
     private float y;
     private Rect outline; //Outermost Rect that contains this item
 
-    private static final int PADDING = 20;
-    private static final int TITLE_PADDING = 30;
-
     /**
      * Create a new ClassDiagItem
      *
-     * @param title
-     * @param x
-     * @param y
+     * @param title      String title to be used in the ClassDiagItem
+     * @param attributes list of attributes to be used in the ClassDiagItem
+     * @param methods    list of methods contained in the ClassDiagItem
+     * @param x          coordinate to place this item
+     * @param y          coordinate to place this item
      */
     public ClassDiagItem(String title, String attributes, String methods, float x, float y) {
         this.title = title;
@@ -47,8 +51,8 @@ public class ClassDiagItem {
     /**
      * Set the position (bottom left)
      *
-     * @param x
-     * @param y
+     * @param x coordinate of new position
+     * @param y coordinate of new position
      */
     public void set(float x, float y) {
         this.x = x;
@@ -58,11 +62,11 @@ public class ClassDiagItem {
     /**
      * One setter method that handles setting the text contents of this ClassDiagItem
      *
-     * @param title the new title
-     * @param attrs the new list of attributes
+     * @param title   the new title
+     * @param attrs   the new list of attributes
      * @param methods the new list of methods
      */
-    public void setTexts(String title, String attrs, String methods){
+    public void setTexts(String title, String attrs, String methods) {
         this.title = title;
         this.attributes = attrs;
         this.methods = methods;
@@ -124,8 +128,9 @@ public class ClassDiagItem {
      * @return an int height
      */
     private int calcMaxHeight() {
-        float ht = (TITLE_PADDING * 2) +
-                (Paints.getDefaultTextTitlePaint().descent() - Paints.getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
+        float ht = (TITLE_PADDING * 2)
+                + (Paints.getDefaultTextTitlePaint().descent()
+                - Paints.getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
 
         if (attributes.length() + methods.length() > 0) {
             ht += PADDING * 4; //twice for attributes, twice for methods (each top/bottom)
@@ -163,7 +168,8 @@ public class ClassDiagItem {
         if (this.methods.length() + this.attributes.length() > 0) {
 
             //horizontal line below the title
-            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(), Paints.getDefaultOutlinePaint());
+            c.drawLine(x, y + titleBounds.height(), x + bounds.width(), y + titleBounds.height(),
+                    Paints.getDefaultOutlinePaint());
 
             //draw the attributes
             Rect attrBounds = new Rect();
@@ -188,12 +194,14 @@ public class ClassDiagItem {
      * @param toDraw  String to draw
      * @param c       Canvas on which to draw
      * @param p       Paint to use to draw text
-     * @param x       coordinate to draw the text
-     * @param y       coordinate to draw the text
+     * @param xC      coordinate to draw the text
+     * @param yC      coordinate to draw the text
      * @param padding between x&y and start of text
      * @param bounds  Rect to place the bounds of the drawn text
      */
-    private void drawMultiLineText(String toDraw, Canvas c, Paint p, float x, float y, int padding, Rect bounds) {
+    private void drawMultiLineText(String toDraw, Canvas c, Paint p, float xC, float yC, int padding, Rect bounds) {
+        float x = xC;
+        float y = yC;
         bounds.left = (int) x;
         bounds.top = (int) y;
         bounds.right = (int) x;
@@ -217,11 +225,11 @@ public class ClassDiagItem {
     }
 
     /**
-     * Check to see if the given coordinates are contained in this ClassDiagItem
+     * Check to see if the given location is contained in this ClassDiagItem
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x coordinate of location
+     * @param y coordinate of location
+     * @return true if the given location is contained in this ClassDiagItem, false otherwise
      */
     public boolean contains(int x, int y) {
         return this.outline.contains(x, y);

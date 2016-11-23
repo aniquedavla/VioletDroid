@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
+
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,18 +18,32 @@ import java.io.PrintWriter;
 /**
  * Use to manage Files, i.e. saving and loading
  */
-public class FileHelper {
-    private static final String TAG = "FileHelper";
-
-    public static final File VIOLET_DROID_FOLDER = new File(Environment.getExternalStorageDirectory() + "/violetdroid/");
+public final class FileHelper {
+    /** Location for all saved data*/
+    public static final File VIOLET_DROID_FOLDER
+            = new File(Environment.getExternalStorageDirectory() + "/violetdroid/");
+    /** Location for all saved photos */
     public static final File PICTURES_FOLDER = new File(Environment.getExternalStorageDirectory() + "/Pictures/");
+    /** Extension for saved files */
     public static final String EXTENSION = ".vdroid";
+    /** Extension used for images */
     public static final String IMG_EXTENSION = ".png";
 
+    /** key used to get a file type (which editor) */
     public static final String FILE_TYPE_KEY = "file_type";
+    /** key used to get an item type */
     public static final String ITEM_TYPE_KEY = "item_type";
+    /** key used to get an item's location  */
     public static final String LOC_X_KEY = "location_x";
+    /** key used to get an item's location  */
     public static final String LOC_Y_KEY = "location_y";
+
+    private static final String TAG = "FileHelper";
+
+    /**
+     * Private constructor to make checkstyle happy
+     */
+    private FileHelper() { }
 
     /**
      * Saves the given contents to the given location
@@ -55,6 +71,7 @@ public class FileHelper {
      *
      * @param image           to be written
      * @param destinationFile where to write the given image
+     * @param ctx Context of the application
      * @return true if the file was written successfully, false otherwise
      */
     public static boolean writeImageFile(Bitmap image, File destinationFile, Context ctx) {
@@ -85,6 +102,7 @@ public class FileHelper {
      *
      * @param jObj            to be written
      * @param destinationFile where to write the given JSONObject
+     * @param ctx Context of the application
      * @return true if the file was written successfully, false otherwise
      */
     public static boolean writeJsonFile(JSONObject jObj, File destinationFile, Context ctx) {
@@ -126,7 +144,8 @@ public class FileHelper {
     public static void initializeFiles() {
         if (!FileHelper.VIOLET_DROID_FOLDER.exists())
             if (!FileHelper.VIOLET_DROID_FOLDER.mkdir())
-                Log.e(TAG, "initialize: could not create violetDriod directory [" + FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "]");
+                Log.e(TAG, "initialize: could not create violetDriod directory ["
+                        + FileHelper.VIOLET_DROID_FOLDER.getAbsolutePath() + "]");
 
         if (!FileHelper.PICTURES_FOLDER.exists()) {
             Log.w(TAG, "initialize: Pictures directory did not already exist. Attempting to create it now");
