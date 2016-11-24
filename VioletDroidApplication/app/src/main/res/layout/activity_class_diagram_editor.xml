@@ -76,11 +76,11 @@
                 android:text="@string/new_str" />
 
             <Button
-                android:id="@+id/class_diag_editor_button6"
+                android:id="@+id/class_diag_editor_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="6" />
+                android:text="note" />
 
             <Button
                 android:id="@+id/class_diag_editor_delete"
