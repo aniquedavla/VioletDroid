@@ -15,7 +15,7 @@ import org.json.JSONObject;
  * A ClassDiagItem represents one Item in a Class Diagram Editor
  * It contains the text and the Rectangle around the text
  */
-public class ClassDiagItem {
+public class ClassDiagItem extends ClassDiagShape {
     private static final String TAG = "ClassDiagItem";
 
     private static final int PADDING = 20;

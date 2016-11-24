@@ -10,6 +10,11 @@
     <string name="class_diag_enter_methods_hint">Methods</string>
     <string name="class_diag_err_missing_title">The Class Diagram Item must have a title that is not blank.</string>
 
+    <!--Notes-->
+    <string name="note_enter_title">Enter Note Text</string>
+    <string name="note_edit_title">Edit Note Text</string>
+    <string name="note_enter_text_hint">Note Text</string>
+
     <!--Saving and Loading-->
     <string name="overwrite_dialog_title">File Already Exists</string>
     <string name="overwrite_dialog_body">The already exists, would you like to overwrite it?</string>

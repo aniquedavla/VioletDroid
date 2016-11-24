@@ -40,9 +40,11 @@ public class ClassDiagEditorView extends View {
 
     //Items: everything here needs to be saved/loaded
     private ArrayList<ClassDiagItem> mClassItems;
+    private ArrayList<ClassDiagNote> mClassNotes;
     //todo::add a list of arrows
 
-    private ClassDiagItem selected = null; //null means none are selected
+    // TODO (maybe): make abstract class for ClassDiagItem and ClassDiagNote to extend, change type of selected to abstract class
+    private ClassDiagShape selected = null; //null means none are selected
     private Context ctx;
 
     private int x;  // starting x-coordinate of touch
@@ -82,6 +84,7 @@ public class ClassDiagEditorView extends View {
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
         mClassItems = new ArrayList<>();
+        mClassNotes = new ArrayList<>();
 
         handler = new Handler();
         longPress = new Runnable() {
@@ -172,6 +175,18 @@ public class ClassDiagEditorView extends View {
                 }
             } else {
                 item.draw(canvas, false);
+            }
+        }
+
+        for (ClassDiagNote note : mClassNotes) {
+            if (selected != null) {
+                if (selected.equals(note)) {
+                    note.draw(canvas, true);
+                } else {
+                    note.draw(canvas, false);
+                }
+            } else {
+                note.draw(canvas, false);
             }
         }
 
@@ -300,9 +315,9 @@ public class ClassDiagEditorView extends View {
 
         //if we're editing an item, populate the dialog with the current contents
         if (editingItem) {
-            inputTitleView.setText(selected.getTitle());
-            inputAttrsView.setText(selected.getAttributes());
-            inputMethodsView.setText(selected.getMethods());
+            inputTitleView.setText(((ClassDiagItem)selected).getTitle());
+            inputAttrsView.setText(((ClassDiagItem)selected).getAttributes());
+            inputMethodsView.setText(((ClassDiagItem)selected).getMethods());
             inputTitleView.selectAll();
         }
 
@@ -318,7 +333,7 @@ public class ClassDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (editingItem) { //if we're editing an item, just update the contents
-                    selected.setTexts(inputTitleView.getText().toString(),
+                    ((ClassDiagItem)selected).setTexts(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
                             inputMethodsView.getText().toString());
                 } else {
@@ -328,7 +343,73 @@ public class ClassDiagEditorView extends View {
                     selected = new ClassDiagItem(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
                             inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
-                    mClassItems.add(selected);
+                    mClassItems.add(((ClassDiagItem)selected));
+                }
+
+                savePending = true; //we've made changes to the editor
+                postInvalidate();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show(); //show the AlertDialog
+    }
+
+    public void addOrEditNote() {
+        Log.d(TAG, "addOrEditNote");
+
+        // we are editing a note if we already have one selected
+        final boolean editingNote = (selected != null && selected instanceof ClassDiagNote);
+
+        final LinearLayout inputHolders = new LinearLayout(ctx);
+        inputHolders.setOrientation(LinearLayout.VERTICAL);
+        final EditText inputTextView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        inputTextView.setHint(R.string.note_enter_text_hint);
+//        inputTitleView.setSingleLine();
+//        final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+//        inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
+//        final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+//        inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
+
+        //if we're editing a note, populate the dialog with the current contents
+        if (editingNote) {
+            inputTextView.setText(((ClassDiagNote)selected).getText());
+//            inputAttrsView.setText(selected.getAttributes());
+//            inputMethodsView.setText(selected.getMethods());
+            inputTextView.selectAll();
+        }
+
+        inputHolders.addView(inputTextView);
+//        inputHolders.addView(inputAttrsView);
+//        inputHolders.addView(inputMethodsView);
+
+        //create the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(editingNote ? R.string.note_edit_title
+                : R.string.note_enter_title);
+        builder.setView(inputHolders);
+        builder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (editingNote) { //if we're editing a note, just update the contents
+                    ((ClassDiagNote)selected).setText(inputTextView.getText().toString());
+//                            inputAttrsView.getText().toString(),
+//                            inputMethodsView.getText().toString());
+                } else {
+                    // we are creating a new item
+
+                    // 100, 100 in the following line is an arbitrary point
+                    selected = new ClassDiagNote(inputTextView.getText().toString(), 100, 100);
+//                            inputAttrsView.getText().toString(),
+//                            inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
+
+                    Log.i(TAG, "Creating note: " + selected);
+
+                    mClassNotes.add(((ClassDiagNote)selected));
                 }
 
                 savePending = true; //we've made changes to the editor

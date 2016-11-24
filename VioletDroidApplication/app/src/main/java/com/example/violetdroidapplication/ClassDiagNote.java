@@ -11,7 +11,7 @@ import org.json.JSONObject;
  * A ClassDiagNote represents a note in the class diagram.
  * The user may select its background color from a pre-defined list.
  */
-public class ClassDiagNote {
+public class ClassDiagNote extends ClassDiagShape {
     private static final String TAG = "ClassDiagNote";
 
     private static final int PADDING = 20;
