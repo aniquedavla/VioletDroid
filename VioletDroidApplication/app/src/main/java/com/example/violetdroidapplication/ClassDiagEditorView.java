@@ -3,8 +3,11 @@ package com.example.violetdroidapplication;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,8 +16,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -26,10 +31,15 @@ import java.util.ArrayList;
  * This View will be used as the main editor for Class Diagrams
  */
 public class ClassDiagEditorView extends View {
+    /** used for saving files */
+    public static final String ITEMS_KEY = "items";
+    private static final String FILE_TYPE = "class_diagram";
+
+
     private static final String TAG = "ClassDiagEditorView";
 
-    //Items: everything in this block needs to be saved/loaded
-    private ArrayList<ClassDiagItem> ClassItems;
+    //Items: everything here needs to be saved/loaded
+    private ArrayList<ClassDiagItem> mClassItems;
     //todo::add a list of arrows
 
     private ClassDiagItem selected = null; //null means none are selected
@@ -37,7 +47,7 @@ public class ClassDiagEditorView extends View {
 
     private int x;  // starting x-coordinate of touch
     private int y;  // starting y-coordinate of touch
-    boolean draggable;  // whether selected item is ready to be dragged
+    private boolean draggable;  // whether selected item is ready to be dragged
 
     // handles long presses
     private Handler handler;
@@ -45,16 +55,18 @@ public class ClassDiagEditorView extends View {
     private boolean isLongPressed = false;
 
     //cell layout
-    private int numColumns, numRows;
-    private int cellWidth, cellHeight;
+    private int numColumns;
+    private int numRows;
+    private int cellWidth;
+    private int cellHeight;
     private Paint blackPaint = new Paint();
     private boolean[][] cellChecked;
 
-    //saving and loading
     private boolean savePending = false;
-    public static final String ITEMS_KEY = "items";
-    private static final String FILE_TYPE = "class_diagram";
 
+    /**
+     * @param context of this application
+     */
     public ClassDiagEditorView(Context context) {
         this(context, null);
     }
@@ -62,14 +74,14 @@ public class ClassDiagEditorView extends View {
     /**
      * Create a new editor view
      *
-     * @param ctx
-     * @param attrs
+     * @param ctx   of this application
+     * @param attrs attributes used to create this View
      */
     public ClassDiagEditorView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
-        ClassItems = new ArrayList<>();
+        mClassItems = new ArrayList<>();
 
         handler = new Handler();
         longPress = new Runnable() {
@@ -84,26 +96,50 @@ public class ClassDiagEditorView extends View {
         };
     }
 
+    /**
+     * set the number of columns
+     *
+     * @param numColumns new number of columns
+     */
     public void setNumColumns(int numColumns) {
         this.numColumns = numColumns;
         calculateDimensions();
     }
 
+    /**
+     * @return the number of columns
+     */
     public int getNumColumns() {
         return numColumns;
     }
 
+    /**
+     * set the number of rows
+     *
+     * @param numRows new number of rows
+     */
     public void setNumRows(int numRows) {
         this.numRows = numRows;
         calculateDimensions();
     }
 
+    /**
+     * called automatically when the size is changed
+     *
+     * @param w    width
+     * @param h    height
+     * @param oldw old width
+     * @param oldh old height
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         calculateDimensions();
     }
 
+    /**
+     * used to calculate the dimensions
+     */
     private void calculateDimensions() {
         if (numColumns < 1 || numRows < 1) {
             return;
@@ -127,7 +163,7 @@ public class ClassDiagEditorView extends View {
 
         Log.d(TAG, "onDraw, selected: " + selected);
 
-        for (ClassDiagItem item : ClassItems) {
+        for (ClassDiagItem item : mClassItems) {
             if (selected != null) {
                 if (selected.equals(item)) {
                     item.draw(canvas, true);
@@ -216,15 +252,24 @@ public class ClassDiagEditorView extends View {
                 }
 
                 break;
+            default:
+                break;
         }
 
         postInvalidate();
         return true;
     }
 
+    /**
+     * find an item at the given location
+     *
+     * @param x coordinate of location
+     * @param y coordinate of location
+     * @return item at the location, null if nothing is there
+     */
     public ClassDiagItem findItem(int x, int y) {
         Log.i(TAG, "findItem");
-        for (ClassDiagItem item : ClassItems)
+        for (ClassDiagItem item : mClassItems)
             if (item.contains(x, y))
                 return item;
 
@@ -233,37 +278,60 @@ public class ClassDiagEditorView extends View {
     }
 
     /**
-     * prompts the user to add an Item with some String
-     * immediately adds the view
+     * If a ClassDiagItem is already selected, this method will edit its attributes
+     * Prompts the user to input attributes
+     * Immediately updates the view by redrawing
      */
-    public void addItem() {
-        Log.i(TAG, "addItem");
+    public void addOrEditItem() {
+        Log.d(TAG, "addOrEditItem");
+
+        //we are editing an item if we already have one selected, later on selected can be an arrow
+        final boolean editingItem = (selected != null && selected instanceof ClassDiagItem);
+
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
         final EditText inputTitleView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputTitleView.setHint(R.string.class_diag_enter_title_hint);
+        inputTitleView.setSingleLine();
         final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
         final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
+
+        //if we're editing an item, populate the dialog with the current contents
+        if (editingItem) {
+            inputTitleView.setText(selected.getTitle());
+            inputAttrsView.setText(selected.getAttributes());
+            inputMethodsView.setText(selected.getMethods());
+            inputTitleView.selectAll();
+        }
+
         inputHolders.addView(inputTitleView);
         inputHolders.addView(inputAttrsView);
         inputHolders.addView(inputMethodsView);
         //create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-        builder.setTitle(R.string.class_diag_enter_title);
+        builder.setTitle(editingItem ? R.string.class_diag_edit_title
+                : R.string.class_diag_enter_title);
         builder.setView(inputHolders);
         builder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String inputTitle = inputTitleView.getText().toString();
-                String inputAttrs = inputAttrsView.getText().toString();
-                String inputMethods = inputMethodsView.getText().toString();
+                if (editingItem) { //if we're editing an item, just update the contents
+                    selected.setTexts(inputTitleView.getText().toString(),
+                            inputAttrsView.getText().toString(),
+                            inputMethodsView.getText().toString());
+                } else {
+                    // we are creating a new item
 
-                // 100, 100 in the following line is an arbitrary point
-                selected = new ClassDiagItem(inputTitle, inputAttrs, inputMethods, 100, 100); //add a new item AND select it
-                ClassItems.add(selected);
-                savePending = true;
+                    // 100, 100 in the following line is an arbitrary point
+                    selected = new ClassDiagItem(inputTitleView.getText().toString(),
+                            inputAttrsView.getText().toString(),
+                            inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
+                    mClassItems.add(selected);
+                }
+
+                savePending = true; //we've made changes to the editor
                 postInvalidate();
             }
         });
@@ -274,30 +342,32 @@ public class ClassDiagEditorView extends View {
             }
         });
         builder.show(); //show the AlertDialog
-
-        postInvalidate(); //once we're out of the AlertDialog, force update the view 
     }
 
     /**
      * To be used when loading a saved state
-     * @param cdi
+     *
+     * @param cdi ClassDiagItem item to add
      */
     public void addItem(ClassDiagItem cdi) {
-        ClassItems.add(cdi);
+        mClassItems.add(cdi);
         postInvalidate();
     }
 
     /**
      * @return true if this working area is empty, false otherwise
      */
-    public boolean isEmpty(){
-        return this.ClassItems.isEmpty();
+    public boolean isEmpty() {
+        return this.mClassItems.isEmpty();
     }
 
+    /**
+     * @return a JSONObject that contains all the information of this editor
+     */
     public JSONObject toJson() {
         try {
             JSONArray arr = new JSONArray();
-            for (ClassDiagItem currItem : ClassItems)
+            for (ClassDiagItem currItem : mClassItems)
                 arr.put(currItem.toJson());
 
             JSONObject obj = new JSONObject();
@@ -307,8 +377,8 @@ public class ClassDiagEditorView extends View {
             return obj;
 
         } catch (Exception e) {
-            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
             Log.e(TAG, "toArray: ", e);
+            Toast.makeText(ctx, R.string.save_error, Toast.LENGTH_LONG).show();
             return null;
         }
     }
@@ -316,12 +386,14 @@ public class ClassDiagEditorView extends View {
     /**
      * @return true if there is a change pending to be saved, false otherwise
      */
-    public boolean getSavePending(){ return savePending; }
+    public boolean getSavePending() {
+        return savePending;
+    }
 
     /**
      * @param savePending new boolean whether change is pending
      */
-    public void setSavePending(boolean savePending){
+    public void setSavePending(boolean savePending) {
         this.savePending = savePending;
     }
 
@@ -330,9 +402,12 @@ public class ClassDiagEditorView extends View {
      * THIS SHOULD ONLY BE CALLED AFTER USER'S CONSENT
      */
     public void resetSpace() {
-        ClassItems.clear();
+        mClassItems.clear();
+        selected = null;
+
         //todo::add arrowsList.clear()
         savePending = false;
+        postInvalidate();
     }
 
     /**
@@ -340,9 +415,29 @@ public class ClassDiagEditorView extends View {
      */
     public void deleteItem() {
         if (selected != null) {
-            ClassItems.remove(selected);
+            mClassItems.remove(selected);
+            savePending = true; //if an item is deleted, a save is pending
+            selected = null; //now nothing is selected
+            draggable = false;
         }
+
         // TODO: delete arrows
         postInvalidate();
     }
+
+    /**
+     * @return a Bitmap object containing this View's items
+     */
+    public Bitmap getBitmap() {
+        Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        Drawable bgDrawable = this.getBackground();
+        if (bgDrawable != null)
+            bgDrawable.draw(canvas);
+        else
+            canvas.drawColor(Color.WHITE);
+        this.draw(canvas);
+        return result;
+    }
+
 }
