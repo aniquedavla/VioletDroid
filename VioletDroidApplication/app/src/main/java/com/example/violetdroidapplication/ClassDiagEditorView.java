@@ -43,7 +43,6 @@ public class ClassDiagEditorView extends View {
     private ArrayList<ClassDiagNote> mClassNotes;
     //todo::add a list of arrows
 
-    // TODO (maybe): make abstract class for ClassDiagItem and ClassDiagNote to extend, change type of selected to abstract class
     private ClassDiagShape selected = null; //null means none are selected
     private Context ctx;
 
@@ -282,11 +281,16 @@ public class ClassDiagEditorView extends View {
      * @param y coordinate of location
      * @return item at the location, null if nothing is there
      */
-    public ClassDiagItem findItem(int x, int y) {
+    public ClassDiagShape findItem(int x, int y) {
         Log.i(TAG, "findItem");
         for (ClassDiagItem item : mClassItems)
             if (item.contains(x, y))
                 return item;
+
+        for (ClassDiagNote note : mClassNotes) {
+            if (note.contains(x, y))
+                return note;
+        }
 
         Log.i(TAG, "findItem: FOUND NOTHING: returning null");
         return null;

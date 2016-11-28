@@ -3,10 +3,10 @@ package com.example.violetdroidapplication;
 /**
  * A shape representing an object in the class diagram
  */
-// TODO: remove duplicate fields/methods from ClassDiagItem
+// TODO: remove duplicate fields/methods from ClassDiagItem and ClassDiagNote
 public abstract class ClassDiagShape {
-    private float x;
-    private float y;
+    protected float x;
+    protected float y;
 
     /**
      * Set the position (bottom left)

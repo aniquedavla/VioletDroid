@@ -25,8 +25,6 @@ public class ClassDiagItem extends ClassDiagShape {
     private String attributes;
     private String methods;
 
-    private float x;
-    private float y;
     private Rect outline; //Outermost Rect that contains this item
 
     /**
@@ -48,16 +46,6 @@ public class ClassDiagItem extends ClassDiagShape {
         Log.i(TAG, "ClassDiagItem: methods: " + methods);
     }
 
-    /**
-     * Set the position (bottom left)
-     *
-     * @param x coordinate of new position
-     * @param y coordinate of new position
-     */
-    public void set(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
 
     /**
      * One setter method that handles setting the text contents of this ClassDiagItem
