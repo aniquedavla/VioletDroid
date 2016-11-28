@@ -500,7 +500,10 @@ public class ClassDiagEditorView extends View {
      */
     public void deleteItem() {
         if (selected != null) {
-            mClassItems.remove(selected);
+            if (selected instanceof ClassDiagItem)
+                mClassItems.remove(selected);
+            else if (selected instanceof ClassDiagNote)
+                mClassNotes.remove(selected);
             savePending = true; //if an item is deleted, a save is pending
             selected = null; //now nothing is selected
             draggable = false;
