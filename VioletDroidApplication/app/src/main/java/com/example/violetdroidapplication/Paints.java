@@ -84,6 +84,7 @@ public final class Paints {
     }
 
     /**
+     * @param selected whether the Arrow is selected 
      * @return the default Paint to be used with arrows
      */
     public static Paint getDefaultArrowPaint(boolean selected) {

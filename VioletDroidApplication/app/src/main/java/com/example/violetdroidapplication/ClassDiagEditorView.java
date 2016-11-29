@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by vishaalprasad on 10/27/16.
@@ -407,6 +406,10 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
     }
 
+    /**
+     * Add a ClassDiagramDrawable to this View
+     * @param drawable to add to this View
+     */
     public void addDrawable(ClassDiagramDrawable drawable) {
         allClassDrawables.add(drawable);
         postInvalidate();

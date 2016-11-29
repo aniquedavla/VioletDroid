@@ -287,7 +287,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         Thread arrowThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                ClassDiagShape start, end;
+                ClassDiagShape start;
+                ClassDiagShape end;
 
                 showToast(R.string.arrow_start);
                 editorView.setWaitingForArrowInput(true);

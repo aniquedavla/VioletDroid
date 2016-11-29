@@ -253,7 +253,7 @@ public class ClassDiagItem extends ClassDiagShape {
      * @return the title
      */
     @Override
-    public String toString(){
+    public String toString() {
         return this.title;
     }
 }
