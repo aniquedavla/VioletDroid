@@ -196,7 +196,10 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                     editorView.addDrawable(ClassDiagItem.fromJson(arr.getJSONObject(i)));
                 else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagNote.class.getName()))
                     editorView.addDrawable(ClassDiagNote.fromJson(arr.getJSONObject(i)));
-                // attn::if it's an arrow then ArrowsList.add the item
+                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY)
+                        .equals(ClassDiagArrow.class.getName()))
+                    editorView.addDrawable(ClassDiagArrow.fromJson(arr.getJSONObject(i),
+                            editorView.getAllClassDrawables()));
             }
 
             editorView.setSavePending(false); //when we fileLoad, there are no more saves pending
@@ -321,7 +324,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(ClassDiagramEditorActivity.this, resId, Toast.LENGTH_LONG).show();
+                Toast.makeText(ClassDiagramEditorActivity.this, resId, Toast.LENGTH_SHORT).show();
             }
         });
     }

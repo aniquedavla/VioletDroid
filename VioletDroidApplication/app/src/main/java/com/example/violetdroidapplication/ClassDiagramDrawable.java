@@ -14,5 +14,4 @@ public interface ClassDiagramDrawable {
     boolean contains(int x, int y);
 
     JSONObject toJson();
-
 }

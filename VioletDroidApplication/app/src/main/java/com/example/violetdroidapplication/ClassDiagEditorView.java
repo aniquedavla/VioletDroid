@@ -496,6 +496,13 @@ public class ClassDiagEditorView extends View {
     }
 
     /**
+     * @return an ArrayList contianing all the drawables
+     */
+    public ArrayList<ClassDiagramDrawable> getAllClassDrawables() {
+        return allClassDrawables;
+    }
+
+    /**
      * @return a JSONObject that contains all the information of this editor
      */
     public JSONObject toJson() {
