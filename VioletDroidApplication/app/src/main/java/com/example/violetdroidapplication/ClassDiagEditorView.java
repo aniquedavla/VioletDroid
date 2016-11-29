@@ -31,7 +31,9 @@ import java.util.ArrayList;
  * This View will be used as the main editor for Class Diagrams
  */
 public class ClassDiagEditorView extends View {
-    /** used for saving files */
+    /**
+     * used for saving files
+     */
     public static final String ITEMS_KEY = "items";
     private static final String FILE_TYPE = "class_diagram";
 
@@ -155,6 +157,9 @@ public class ClassDiagEditorView extends View {
         invalidate();
     }
 
+    /**
+     * @return the number of rows
+     */
     public int getNumRows() {
         return numRows;
     }
@@ -309,19 +314,20 @@ public class ClassDiagEditorView extends View {
 
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
-        final EditText inputTitleView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        //these EditTexts will lie insied the AlertDialog
+        final EditText inputTitleView = new EditText(ctx);
         inputTitleView.setHint(R.string.class_diag_enter_title_hint);
         inputTitleView.setSingleLine();
-        final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        final EditText inputAttrsView = new EditText(ctx);
         inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
-        final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        final EditText inputMethodsView = new EditText(ctx);
         inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
 
         //if we're editing an item, populate the dialog with the current contents
         if (editingItem) {
-            inputTitleView.setText(((ClassDiagItem)selected).getTitle());
-            inputAttrsView.setText(((ClassDiagItem)selected).getAttributes());
-            inputMethodsView.setText(((ClassDiagItem)selected).getMethods());
+            inputTitleView.setText(((ClassDiagItem) selected).getTitle());
+            inputAttrsView.setText(((ClassDiagItem) selected).getAttributes());
+            inputMethodsView.setText(((ClassDiagItem) selected).getMethods());
             inputTitleView.selectAll();
         }
 
@@ -337,7 +343,7 @@ public class ClassDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (editingItem) { //if we're editing an item, just update the contents
-                    ((ClassDiagItem)selected).setTexts(inputTitleView.getText().toString(),
+                    ((ClassDiagItem) selected).setTexts(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
                             inputMethodsView.getText().toString());
                 } else {
@@ -346,8 +352,9 @@ public class ClassDiagEditorView extends View {
                     // 100, 100 in the following line is an arbitrary point
                     selected = new ClassDiagItem(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
-                            inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
-                    mClassItems.add(((ClassDiagItem)selected));
+                            //add new item AND select it
+                            inputMethodsView.getText().toString(), 100, 100);
+                    mClassItems.add(((ClassDiagItem) selected));
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -363,6 +370,9 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
     }
 
+    /**
+     * method used to add or edit a note 
+     */
     public void addOrEditNote() {
         Log.d(TAG, "addOrEditNote");
 
@@ -371,12 +381,12 @@ public class ClassDiagEditorView extends View {
 
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
-        final EditText inputTextView = new EditText(ctx); //this EditText will lie inside the AlertDialog
+        final EditText inputTextView = new EditText(ctx);
         inputTextView.setHint(R.string.note_enter_text_hint);
 
         //if we're editing a note, populate the dialog with the current contents
         if (editingNote) {
-            inputTextView.setText(((ClassDiagNote)selected).getText());
+            inputTextView.setText(((ClassDiagNote) selected).getText());
             inputTextView.selectAll();
         }
 
@@ -391,13 +401,13 @@ public class ClassDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (editingNote) { //if we're editing a note, just update the contents
-                    ((ClassDiagNote)selected).setText(inputTextView.getText().toString());
+                    ((ClassDiagNote) selected).setText(inputTextView.getText().toString());
                 } else {
                     selected = new ClassDiagNote(inputTextView.getText().toString(), 100, 100);
 
                     Log.i(TAG, "Creating note: " + selected);
 
-                    mClassNotes.add(((ClassDiagNote)selected));
+                    mClassNotes.add(((ClassDiagNote) selected));
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -426,7 +436,7 @@ public class ClassDiagEditorView extends View {
     /**
      * Adds note to diagram when loading saved file
      *
-     * @param cdn
+     * @param cdn ClassDiagNote to add
      */
     public void addNote(ClassDiagNote cdn) {
         mClassNotes.add(cdn);
@@ -515,7 +525,8 @@ public class ClassDiagEditorView extends View {
      * @return a Bitmap object containing this View's items
      */
     public Bitmap getBitmap() {
-        Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(),
+                Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
         Drawable bgDrawable = this.getBackground();
         if (bgDrawable != null)
