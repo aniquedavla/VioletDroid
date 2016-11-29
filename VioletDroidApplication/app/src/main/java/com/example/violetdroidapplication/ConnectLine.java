@@ -1,6 +1,5 @@
 package com.example.violetdroidapplication;
 import android.graphics.Point;
-import java.awt.*;
 
 import android.*;
 import android.graphics.*;

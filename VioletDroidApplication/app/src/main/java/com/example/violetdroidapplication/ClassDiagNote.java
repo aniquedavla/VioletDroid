@@ -2,6 +2,8 @@ package com.example.violetdroidapplication;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -20,6 +22,7 @@ public class ClassDiagNote extends ClassDiagShape {
 
     private float x;
     private float y;
+    private PointF thisPointF = new PointF();
     private Rect outline; // Outermost Rect that contains this item
 
     /**
@@ -35,6 +38,8 @@ public class ClassDiagNote extends ClassDiagShape {
         this.y = y;
 
         Log.i(TAG, "ClassDiagNote: text: " + text);
+        Point the = new Point((int)x, (int)y);
+        thisPointF = new PointF(the);
     }
 
     /**
@@ -118,6 +123,12 @@ public class ClassDiagNote extends ClassDiagShape {
 
         //draw the text
         drawMultiLineText(text, c, Paints.getDefaultTextPaint(), x, y, PADDING, bounds);
+
+        //DRAW LINE between to PointF-> ( made of a Point(x,y)
+        PointF endPoint = new PointF(new Point(((int)x + 50),((int)y+50)));
+        ConnectLine drawLine = new ConnectLine(thisPointF,endPoint);
+        drawLine.paint(c);
+
     }
 
     /**
