@@ -50,9 +50,9 @@ public final class FileHelper {
      * Will overwrite if the file already exists
      *
      * @param obj contents to sv
-     * @param f   location to save the object
+     * @param f   location to fileSave the object
      * @param ctx used to throw toast
-     * @return true if save was successful, false otherwise
+     * @return true if fileSave was successful, false otherwise
      */
     public static boolean writeFile(Object obj, File f, Context ctx) {
         if (obj instanceof JSONObject)

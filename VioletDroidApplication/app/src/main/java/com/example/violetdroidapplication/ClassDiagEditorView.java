@@ -36,16 +36,16 @@ public class ClassDiagEditorView extends View {
      */
     public static final String ITEMS_KEY = "items";
     private static final String FILE_TYPE = "class_diagram";
-
-
     private static final String TAG = "ClassDiagEditorView";
 
     //Items: everything here needs to be saved/loaded
-    private ArrayList<ClassDiagItem> mClassItems;
-    private ArrayList<ClassDiagNote> mClassNotes;
-    //todo::add a list of arrows
+//    private ArrayList<ClassDiagItem> mClassItems;
+//    private ArrayList<ClassDiagNote> mClassNotes;
+//    private ArrayList<ClassDiagArrow> mClassArrows;
 
-    private ClassDiagShape selected = null; //null means none are selected
+    private ArrayList<ClassDiagramDrawable> allClassDrawables;
+
+    private ClassDiagramDrawable selected = null; //null means none are selected
     private Context ctx;
 
     private int x;  // starting x-coordinate of touch
@@ -56,6 +56,10 @@ public class ClassDiagEditorView extends View {
     private Handler handler;
     private Runnable longPress;
     private boolean isLongPressed = false;
+
+    //only used temporarily
+    public ClassDiagShape newArrowHelper;
+    public boolean waitingForArrowInput = false;
 
     //cell layout
     private int numColumns;
@@ -84,8 +88,10 @@ public class ClassDiagEditorView extends View {
         super(ctx, attrs);
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
-        mClassItems = new ArrayList<>();
-        mClassNotes = new ArrayList<>();
+//        mClassItems = new ArrayList<>();
+//        mClassNotes = new ArrayList<>();
+//        mClassArrows = new ArrayList<>();
+        allClassDrawables = new ArrayList<>();
 
         handler = new Handler();
         longPress = new Runnable() {
@@ -170,29 +176,35 @@ public class ClassDiagEditorView extends View {
 
         Log.d(TAG, "onDraw, selected: " + selected);
 
-        for (ClassDiagItem item : mClassItems) {
-            if (selected != null) {
-                if (selected.equals(item)) {
-                    item.draw(canvas, true);
-                } else {
-                    item.draw(canvas, false);
-                }
-            } else {
-                item.draw(canvas, false);
-            }
-        }
+        for (ClassDiagramDrawable drawable : allClassDrawables)
+            drawable.draw(canvas, selected == drawable);
 
-        for (ClassDiagNote note : mClassNotes) {
-            if (selected != null) {
-                if (selected.equals(note)) {
-                    note.draw(canvas, true);
-                } else {
-                    note.draw(canvas, false);
-                }
-            } else {
-                note.draw(canvas, false);
-            }
-        }
+//        for (ClassDiagItem item : mClassItems) {
+//            if (selected != null) {
+//                if (selected.equals(item)) {
+//                    item.draw(canvas, true);
+//                } else {
+//                    item.draw(canvas, false);
+//                }
+//            } else {
+//                item.draw(canvas, false);
+//            }
+//        }
+
+//        for (ClassDiagNote note : mClassNotes) {
+//            if (selected != null) {
+//                if (selected.equals(note)) {
+//                    note.draw(canvas, true);
+//                } else {
+//                    note.draw(canvas, false);
+//                }
+//            } else {
+//                note.draw(canvas, false);
+//            }
+//        }
+
+//        for (ClassDiagArrow arrow : mClassArrows)
+//            arrow.draw(canvas, );
 
         if (numColumns == 0 || numRows == 0)
             return;
@@ -227,13 +239,21 @@ public class ClassDiagEditorView extends View {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 // longPress will be called in 800 ms if not cancelled
-                handler.postDelayed(longPress, 800);
-                Log.i(TAG, "onTouchEvent: ACTION_DOWN [" + x + "," + y + "]");
-                x = Math.round(event.getX());
-                y = Math.round(event.getY());
-                if (findItem(x, y) != null) {
-                    if (findItem(x, y).equals(selected)) {
-                        draggable = true;
+                if (waitingForArrowInput) {
+                    ClassDiagramDrawable tapped = findItem((int) event.getX(), (int) event.getY());
+                    if (tapped != null && tapped instanceof ClassDiagShape) {
+                        newArrowHelper = (ClassDiagShape) tapped;
+                        waitingForArrowInput = false;
+                    }
+                } else {
+                    handler.postDelayed(longPress, 800);
+                    Log.i(TAG, "onTouchEvent: ACTION_DOWN [" + x + "," + y + "]");
+                    x = Math.round(event.getX());
+                    y = Math.round(event.getY());
+                    if (findItem(x, y) != null) {
+                        if (findItem(x, y).equals(selected)) {
+                            draggable = true;
+                        }
                     }
                 }
                 break;
@@ -265,8 +285,9 @@ public class ClassDiagEditorView extends View {
                 handler.removeCallbacks(longPress);
                 int moveX = Math.round(event.getX());
                 int moveY = Math.round(event.getY());
-                if (draggable && selected != null) {
-                    selected.set(moveX, moveY);  // move item by dragging
+                if (draggable && selected != null && selected instanceof ClassDiagShape) {
+                    ClassDiagShape selectedShape = (ClassDiagShape) selected;
+                    selectedShape.set(moveX, moveY);  // move item by dragging
                     savePending = true;
                 }
 
@@ -286,18 +307,22 @@ public class ClassDiagEditorView extends View {
      * @param y coordinate of location
      * @return item at the location, null if nothing is there
      */
-    public ClassDiagShape findItem(int x, int y) {
+    public ClassDiagramDrawable findItem(int x, int y) {
         Log.i(TAG, "findItem");
-        for (ClassDiagItem item : mClassItems)
-            if (item.contains(x, y))
-                return item;
+//        for (ClassDiagItem item : mClassItems)
+//            if (item.contains(x, y))
+//                return item;
 
-        for (ClassDiagNote note : mClassNotes) {
-            if (note.contains(x, y))
-                return note;
-        }
+//        for (ClassDiagNote note : mClassNotes) {
+//            if (note.contains(x, y))
+//                return note;
+//        }
 
-        Log.i(TAG, "findItem: FOUND NOTHING: returning null");
+        for (ClassDiagramDrawable drawable : allClassDrawables)
+            if (drawable.contains(x, y))
+                return drawable;
+
+        Log.d(TAG, "findItem: FOUND NOTHING: returning null");
         return null;
     }
 
@@ -354,7 +379,8 @@ public class ClassDiagEditorView extends View {
                             inputAttrsView.getText().toString(),
                             //add new item AND select it
                             inputMethodsView.getText().toString(), 100, 100);
-                    mClassItems.add(((ClassDiagItem) selected));
+//                    mClassItems.add(((ClassDiagItem) selected));
+                    allClassDrawables.add(((ClassDiagItem) selected));
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -371,7 +397,7 @@ public class ClassDiagEditorView extends View {
     }
 
     /**
-     * method used to add or edit a note 
+     * method used to add or edit a note
      */
     public void addOrEditNote() {
         Log.d(TAG, "addOrEditNote");
@@ -407,7 +433,8 @@ public class ClassDiagEditorView extends View {
 
                     Log.i(TAG, "Creating note: " + selected);
 
-                    mClassNotes.add(((ClassDiagNote) selected));
+//                    mClassNotes.add(((ClassDiagNote) selected));
+                    allClassDrawables.add(((ClassDiagNote) selected));
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -423,31 +450,49 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
     }
 
+//    public void addArrow() {
+//        if (selected == null) {
+//
+//        } else Toast.makeText(ctx, R.string.arrow_deselect, Toast.LENGTH_LONG).show();
+//    }
+
+//    private void showToast(int resId) {
+//
+//        Toast.makeText(ctx, resId, Toast.LENGTH_LONG).show();
+//    }
+
     /**
      * To be used when loading a saved state
      *
      * @param cdi ClassDiagItem item to add
      */
-    public void addItem(ClassDiagItem cdi) {
-        mClassItems.add(cdi);
-        postInvalidate();
-    }
+//    public void addItem(ClassDiagItem cdi) {
+//        mClassItems.add(cdi);
+//        mClassItems.add(cdi);
+//        postInvalidate();
+//    }
 
     /**
      * Adds note to diagram when loading saved file
      *
      * @param cdn ClassDiagNote to add
      */
-    public void addNote(ClassDiagNote cdn) {
-        mClassNotes.add(cdn);
+//    public void addNote(ClassDiagNote cdn) {
+//        mClassNotes.add(cdn);
+//        postInvalidate();
+//    }
+    public void addDrawable(ClassDiagramDrawable drawable) {
+        allClassDrawables.add(drawable);
         postInvalidate();
     }
+
 
     /**
      * @return true if this working area is empty, false otherwise
      */
     public boolean isEmpty() {
-        return (this.mClassItems.isEmpty() && this.mClassNotes.isEmpty());
+//        return (this.mClassItems.isEmpty() && this.mClassNotes.isEmpty());
+        return this.allClassDrawables.isEmpty();
     }
 
     /**
@@ -456,11 +501,13 @@ public class ClassDiagEditorView extends View {
     public JSONObject toJson() {
         try {
             JSONArray arr = new JSONArray();
-            for (ClassDiagItem currItem : mClassItems)
-                arr.put(currItem.toJson());
+//            for (ClassDiagItem currItem : mClassItems)
+//                arr.put(currItem.toJson());
 
-            for (ClassDiagNote currNote : mClassNotes)
-                arr.put(currNote.toJson());
+//            for (ClassDiagNote currNote : mClassNotes)
+//                arr.put(currNote.toJson());
+            for (ClassDiagramDrawable drawable : allClassDrawables)
+                arr.put(drawable.toJson());
 
             JSONObject obj = new JSONObject();
             obj.put(FileHelper.FILE_TYPE_KEY, FILE_TYPE);
@@ -494,11 +541,11 @@ public class ClassDiagEditorView extends View {
      * THIS SHOULD ONLY BE CALLED AFTER USER'S CONSENT
      */
     public void resetSpace() {
-        mClassItems.clear();
-        mClassNotes.clear();
+//        mClassItems.clear();
+//        mClassNotes.clear();
+        allClassDrawables.clear();
         selected = null;
 
-        //todo::add arrowsList.clear()
         savePending = false;
         postInvalidate();
     }
@@ -508,16 +555,17 @@ public class ClassDiagEditorView extends View {
      */
     public void deleteItem() {
         if (selected != null) {
-            if (selected instanceof ClassDiagItem)
-                mClassItems.remove(selected);
-            else if (selected instanceof ClassDiagNote)
-                mClassNotes.remove(selected);
+//            if (selected instanceof ClassDiagItem)
+//                mClassItems.remove(selected);
+//            else if (selected instanceof ClassDiagNote)
+//                mClassNotes.remove(selected);
+
+            allClassDrawables.remove(selected);
             savePending = true; //if an item is deleted, a save is pending
             selected = null; //now nothing is selected
             draggable = false;
         }
 
-        // TODO: delete arrows
         postInvalidate();
     }
 

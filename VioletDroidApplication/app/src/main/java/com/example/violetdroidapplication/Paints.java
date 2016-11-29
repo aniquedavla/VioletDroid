@@ -14,16 +14,19 @@ public final class Paints {
     private static Paint defaultTextTitlePaint;
     private static Paint defaultOutlinePaint;
     private static Paint defaultBgPaint;
+    private static Paint defaultArrowPaint;
 
     private static final int SELECTED_BG_PAINT = Color.parseColor("#DBE9F9");  // color of selected item
 
     /**
      * Private constructor to make checkstyle happy
      */
-    private Paints() { }
+    private Paints() {
+    }
 
     /**
      * Call this in the MainActivity, sets all the Paint objects to be used later on
+     *
      * @param ctx Context of the application
      */
     public static void initializePaints(Context ctx) {
@@ -43,6 +46,10 @@ public final class Paints {
         defaultBgPaint = new Paint();
         defaultBgPaint.setStrokeWidth(0);
         defaultBgPaint.setStyle(Paint.Style.FILL);
+
+        defaultArrowPaint = new Paint();
+        defaultArrowPaint.setStrokeWidth(3);
+        defaultArrowPaint.setStyle(Paint.Style.STROKE);
     }
 
     /**
@@ -74,6 +81,16 @@ public final class Paints {
         defaultBgPaint.setColor(selected ? SELECTED_BG_PAINT : Color.WHITE);
 
         return defaultBgPaint;
+    }
+
+    /**
+     * @return the default Paint to be used with arrows
+     */
+    public static Paint getDefaultArrowPaint(boolean selected) {
+        defaultArrowPaint.setColor(selected ? Color.BLUE : Color.BLACK);
+        defaultArrowPaint.setStrokeWidth(selected ? 5 : 3);
+
+        return defaultArrowPaint;
     }
 
     /**

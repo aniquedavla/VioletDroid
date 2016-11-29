@@ -30,11 +30,11 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     private ClassDiagEditorView editorView;
     private Button plusBtn;
-    private Button saveBtn;
-    private Button saveAsBtn;
-    private Button loadBtn;
-    private Button exportBtn;
-    private Button newBtn;
+    private Button fileBtn;
+    private Button arrowBtn;
+    private Button btn4;
+    private Button btn5;
+    private Button btn6;
     private Button noteBtn;
     private Button deleteBtn;
 
@@ -64,16 +64,16 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
         plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
         plusBtn.setOnClickListener(this);
-        saveBtn = (Button) findViewById(R.id.class_diag_editor_save);
-        saveBtn.setOnClickListener(this);
-        saveAsBtn = (Button) findViewById(R.id.class_diag_editor_save_as);
-        saveAsBtn.setOnClickListener(this);
-        loadBtn = (Button) findViewById(R.id.class_diag_editor_load);
-        loadBtn.setOnClickListener(this);
-        exportBtn = (Button) findViewById(R.id.class_diag_editor_export);
-        exportBtn.setOnClickListener(this);
-        newBtn = (Button) findViewById(R.id.class_diag_editor_new);
-        newBtn.setOnClickListener(this);
+        fileBtn = (Button) findViewById(R.id.class_diag_editor_file);
+        fileBtn.setOnClickListener(this);
+        arrowBtn = (Button) findViewById(R.id.class_diag_editor_arrow);
+        arrowBtn.setOnClickListener(this);
+        btn4 = (Button) findViewById(R.id.class_diag_editor_btn4);
+        btn4.setOnClickListener(this);
+        btn5 = (Button) findViewById(R.id.class_diag_editor_btn5);
+        btn5.setOnClickListener(this);
+        btn6 = (Button) findViewById(R.id.class_diag_editor_bnt6);
+        btn6.setOnClickListener(this);
         noteBtn = (Button) findViewById(R.id.class_diag_editor_note);
         noteBtn.setOnClickListener(this);
         deleteBtn = (Button) findViewById(R.id.class_diag_editor_delete);
@@ -86,20 +86,20 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_plus:
                 editorView.addOrEditItem();
                 break;
-            case R.id.class_diag_editor_save:
-                save();
+            case R.id.class_diag_editor_file:
+                fileDialog();
                 break;
-            case R.id.class_diag_editor_save_as:
-                saveAs();
+            case R.id.class_diag_editor_arrow:
+                addArrow();
                 break;
-            case R.id.class_diag_editor_load:
-                load();
+            case R.id.class_diag_editor_btn4:
+                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.class_diag_editor_export:
-                exportPrompt();
+            case R.id.class_diag_editor_btn5:
+                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.class_diag_editor_new:
-                newWorkingArea();
+            case R.id.class_diag_editor_bnt6:
+                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.class_diag_editor_note:
                 editorView.addOrEditNote();
@@ -140,12 +140,47 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             super.onBackPressed();
     }
 
+    private void fileDialog() {
+        AlertDialog.Builder fileDialogBuilder = new AlertDialog.Builder(this);
+        fileDialogBuilder.setTitle(R.string.file);
+        fileDialogBuilder.setItems(R.array.file_options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        newWorkingArea();
+                        break;
+                    case 1:
+                        fileLoad();
+                        break;
+                    case 2:
+                        fileSave();
+                        break;
+                    case 3:
+                        fileSaveAs();
+                        break;
+                    case 4:
+                        exportPrompt();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        fileDialogBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        fileDialogBuilder.show();
+    }
 
     /**
      * loads a saved state from the given File
      * Logs and shows a Toast when an exception is encountered
      *
-     * @param f File with saved state to load
+     * @param f File with saved state to fileLoad
      */
     private void loadFromFile(File f) {
         JSONObject obj = FileHelper.getJsonFromFile(f, this); //create a JSONObject from the File
@@ -158,13 +193,13 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             //for each item, add it to the view
             for (int i = 0; i < arr.length(); i++) {
                 if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
-                    editorView.addItem(ClassDiagItem.fromJson(arr.getJSONObject(i)));
+                    editorView.addDrawable(ClassDiagItem.fromJson(arr.getJSONObject(i)));
                 else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagNote.class.getName()))
-                    editorView.addNote(ClassDiagNote.fromJson(arr.getJSONObject(i)));
-                // todo::if it's an arrow then ArrowsList.add the item
+                    editorView.addDrawable(ClassDiagNote.fromJson(arr.getJSONObject(i)));
+                // attn::if it's an arrow then ArrowsList.add the item
             }
 
-            editorView.setSavePending(false); //when we load, there are no more saves pending
+            editorView.setSavePending(false); //when we fileLoad, there are no more saves pending
 
         } catch (Exception e) {
             Log.e(TAG, "loadFromJSON: ", e);
@@ -175,23 +210,23 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     /**
      * Save the current state
      */
-    public void save() {
-        if (editorView.isEmpty()) //if it's empty, don't save
+    public void fileSave() {
+        if (editorView.isEmpty()) //if it's empty, don't fileSave
             warnSaveEmpty();
-        else if (currentFile == null) //if we are not currently "working on a file" save as a new file
-            saveAs();
+        else if (currentFile == null) //if we are not currently "working on a file" fileSave as a new file
+            fileSaveAs();
         else if (editorView.getSavePending()) { //we have unsaved changes
             FileHelper.writeFile(editorView.toJson(), currentFile, this);
             editorView.setSavePending(false);
         }
 
-        //otherwise, we have no unsaved changes, no need to save
+        //otherwise, we have no unsaved changes, no need to fileSave
     }
 
     /**
      * Lists available items by calling listItems if there are no changes pending
      */
-    public void load() {
+    public void fileLoad() {
         if (editorView.getSavePending()) { // if we have changes pending then warn the user
             AlertDialog.Builder changesPendingBuilder = new AlertDialog.Builder(this);
             changesPendingBuilder.setTitle(R.string.changes_pending_dialog_title);
@@ -216,9 +251,9 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     /**
      * Allow the user to pick a name for the file they're saving
      */
-    public void saveAs() {
+    public void fileSaveAs() {
         if (editorView.isEmpty())
-            warnSaveEmpty(); //if the current working area is empty, warn the user and do not save anything
+            warnSaveEmpty(); //if the current working area is empty, warn the user and do not fileSave anything
         else {
             final JSONObject obj = editorView.toJson();
             AlertDialog.Builder saveAsBuilder = new AlertDialog.Builder(this);
@@ -245,6 +280,52 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
+    private void addArrow() {
+        Thread arrowThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ClassDiagShape start, end;
+
+                showToast(R.string.arrow_start);
+                editorView.waitingForArrowInput = true;
+                while (editorView.waitingForArrowInput) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                            /* do nothing */
+                    }
+                }
+
+                start = editorView.newArrowHelper;
+
+                showToast(R.string.arrow_end);
+                editorView.waitingForArrowInput = true;
+                while (editorView.waitingForArrowInput) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                            /* do nothing */
+                    }
+                }
+
+                end = editorView.newArrowHelper;
+
+                editorView.addDrawable(new ClassDiagArrow(start, end));
+
+            }
+        });
+        arrowThread.start();
+    }
+
+    private void showToast(final int resId) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ClassDiagramEditorActivity.this, resId, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     /**
      * List the available items and allows the user to pick one to load
      */
@@ -268,7 +349,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 listBuilder.setItems(fileNames, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadFromFile(violetFiles[which]); //when one is selected, load it
+                        loadFromFile(violetFiles[which]); //when one is selected, fileLoad it
                     }
                 });
                 listBuilder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
@@ -302,8 +383,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * check if the desired file exists before saving
      * if the file does exist, then warn the user about overwriting the file before saving
      *
-     * @param obj      contents to save
-     * @param destFile location to save the JSONObject
+     * @param obj      contents to fileSave
+     * @param destFile location to fileSave the JSONObject
      */
     public void checkAndSaveJson(final JSONObject obj, final File destFile) {
         try {
@@ -323,7 +404,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * helper method for checkAndSaveJson
      * Can pass a String instead of a File
      *
-     * @param obj      contents to save
+     * @param obj      contents to fileSave
      * @param fileName name for the File
      */
     public void checkAndSaveJson(final JSONObject obj, String fileName) {
@@ -332,7 +413,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     }
 
     /**
-     * Called when the user is trying to save an empty working area
+     * Called when the user is trying to fileSave an empty working area
      * Just lets the user know that nothing will be done with an empty working area
      */
     public void warnSaveEmpty() {
@@ -384,8 +465,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     /**
      * Warns the user that the file exists and prompts the user to overwrite the file
      *
-     * @param toWrite           contents the user wants to save
-     * @param destFile          where the user wants to save the contents
+     * @param toWrite           contents the user wants to fileSave
+     * @param destFile          where the user wants to fileSave the contents
      * @param updateSavePending update the editorView's savePending boolean,
      *                          should be true for vdroid files, false for images
      */
@@ -437,7 +518,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             resetAreaDialog.setTitle(R.string.new_class_diagram_dialog_title);
             //the message is dependent on if unsaved changes are present
             resetAreaDialog.setMessage(editorView.getSavePending() ? R.string.changes_pending_dialog_body
-                                                                   : R.string.new_class_diagram_dialod_body);
+                    : R.string.new_class_diagram_dialod_body);
             resetAreaDialog.setNegativeButton(R.string.no_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

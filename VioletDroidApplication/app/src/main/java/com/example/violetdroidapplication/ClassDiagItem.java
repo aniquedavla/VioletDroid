@@ -25,8 +25,6 @@ public class ClassDiagItem extends ClassDiagShape {
     private String attributes;
     private String methods;
 
-    private Rect outline; //Outermost Rect that contains this item
-
     /**
      * Create a new ClassDiagItem
      *
@@ -213,17 +211,6 @@ public class ClassDiagItem extends ClassDiagShape {
     }
 
     /**
-     * Check to see if the given location is contained in this ClassDiagItem
-     *
-     * @param x coordinate of location
-     * @param y coordinate of location
-     * @return true if the given location is contained in this ClassDiagItem, false otherwise
-     */
-    public boolean contains(int x, int y) {
-        return this.outline.contains(x, y);
-    }
-
-    /**
      * @return a JSON representation of this ClassDiagItem
      */
     public JSONObject toJson() {
@@ -262,4 +249,11 @@ public class ClassDiagItem extends ClassDiagShape {
         }
     }
 
+    /**
+     * @return the title
+     */
+    @Override
+    public String toString(){
+        return this.title;
+    }
 }

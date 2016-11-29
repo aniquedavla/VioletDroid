@@ -42,9 +42,25 @@
 
     <string name="delete">Delete</string>
 
+    <string name="file_more">File&#8230;</string>
+    <string name="file">File</string>
+    <string-array name="file_options">
+        <item>New</item>
+        <item>Load</item>
+        <item>Save</item>
+        <item>Save As&#8230;</item>
+        <item>Export</item>
+    </string-array>
+
     <string name="new_str">New</string>
     <string name="new_class_diagram_dialog_title">New Class Diagram</string>
     <string name="new_class_diagram_dialod_body">Reset the working area and make a new class diagram?</string>
+
+    <!--Arrow-->
+    <string name="arrow">Arrow</string>
+    <string name="arrow_start">Tap the item where the arrow should start from.</string>
+    <string name="arrow_end">Tap the item where the arrow should end.</string>
+    <string name="arrow_deselect">Please deselect items before adding an arrow</string>
 
     <!--Misc-->
     <string name="ok_str">OK</string>

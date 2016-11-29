@@ -20,7 +20,6 @@ public class ClassDiagNote extends ClassDiagShape {
 
     private float x;
     private float y;
-    private Rect outline; // Outermost Rect that contains this item
 
     /**
      * Create a new ClassDiagNote
@@ -109,7 +108,7 @@ public class ClassDiagNote extends ClassDiagShape {
         bounds.top = (int) y;
         bounds.right = (int) x + this.calcMaxWidth();
         bounds.bottom = bounds.top + calcMaxHeight();
-        this.outline = bounds;
+        outline = bounds;
 
         //draw the rectangle outline
         c.drawRect(bounds, Paints.getDefaultOutlinePaint());
@@ -157,17 +156,6 @@ public class ClassDiagNote extends ClassDiagShape {
     }
 
     /**
-     * Check to see if the given location is contained in this ClassDiagNote
-     *
-     * @param x coordinate of location
-     * @param y coordinate of location
-     * @return true if the given location is contained in this ClassDiagNote, false otherwise
-     */
-    public boolean contains(int x, int y) {
-        return this.outline.contains(x, y);
-    }
-
-    /**
      * @return a JSON representation of this ClassDiagItem
      */
     public JSONObject toJson() {
@@ -203,4 +191,11 @@ public class ClassDiagNote extends ClassDiagShape {
         }
     }
 
+    /**
+     * @return this note's text
+     */
+    @Override
+    public String toString() {
+        return text;
+    }
 }
