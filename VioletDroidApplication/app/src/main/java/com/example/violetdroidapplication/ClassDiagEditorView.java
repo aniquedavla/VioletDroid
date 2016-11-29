@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vishaalprasad on 10/27/16.
@@ -54,8 +55,8 @@ public class ClassDiagEditorView extends View {
     private boolean isLongPressed = false;
 
     //only used temporarily
-    public ClassDiagShape newArrowHelper;
-    public boolean waitingForArrowInput = false;
+    private ClassDiagShape newArrowHelper;
+    private boolean waitingForArrowInput = false;
 
     //cell layout
     private int numColumns;
@@ -425,6 +426,30 @@ public class ClassDiagEditorView extends View {
      */
     public ArrayList<ClassDiagramDrawable> getAllClassDrawables() {
         return allClassDrawables;
+    }
+
+    /**
+     * Get whether this View is waiting for an arrow input
+     * @return waitingForArrowInput
+     */
+    public boolean isWaitingForArrowInput() {
+        return waitingForArrowInput;
+    }
+
+    /**
+     * set this View's waitingForArrowInput
+     * @param waitingForArrowInput new value to set
+     */
+    public void setWaitingForArrowInput(boolean waitingForArrowInput) {
+        this.waitingForArrowInput = waitingForArrowInput;
+    }
+
+    /**
+     * Get the object that the user tapped if waiting for an object
+     * @return ClassDiagShape that the user tapped
+     */
+    public ClassDiagShape getNewArrowHelper() {
+        return newArrowHelper;
     }
 
     /**

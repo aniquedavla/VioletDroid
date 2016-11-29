@@ -18,6 +18,9 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     private enum Directions {HVH, VHV}
 
+    //how far the user can click away from an arrow to select it
+    private static final int SELECT_PADDING = 10;
+
     private ClassDiagShape fromShape;
     private ClassDiagShape toShape;
 
@@ -25,7 +28,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private Point[] lineRoute; //this does not need to be saved [json]
     private Directions direction;
 
-    private Rect bounds; //used for selection
+    private Rect[] selectionBounds; //used for selection
 
     //todo::add arrow type (enum?)
 
@@ -39,6 +42,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         this.fromShape = fromShape;
         this.toShape = toShape;
         this.lineRoute = new Point[4];
+        selectionBounds = new Rect[lineRoute.length - 1];
     }
 
     /**
@@ -50,11 +54,11 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     public void draw(Canvas c, boolean selected) {
         findConnectionPoints();
         getIntermediatePoints();
+        setBounds();
 
         //draw lines
         for (int i = 1; i < lineRoute.length; i++) {
-            c.drawLine(lineRoute[i - 1].x, lineRoute[i - 1].y,
-                    lineRoute[i].x, lineRoute[i].y,
+            c.drawLine(lineRoute[i - 1].x, lineRoute[i - 1].y, lineRoute[i].x, lineRoute[i].y,
                     Paints.getDefaultArrowPaint(selected));
         }
     }
@@ -68,6 +72,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      */
     @Override
     public boolean contains(int x, int y) {
+        for (Rect rect : selectionBounds) if (rect.contains(x, y)) return true;
         return false;
     }
 
@@ -90,7 +95,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         fromConnectionPoints[2] = new Point(fromShape.outline.right, fromShape.outline.centerY());
         fromConnectionPoints[3] = new Point(fromShape.outline.centerX(), fromShape.outline.bottom);
 
-        //todo::theres definitely a way to make this code shorter
+        //todo::there's definitely a way to make this code shorter
         if (deltaX < 0) { //to is LEFT of from
 
             if (deltaY < 0) { // to is ABOVE from
@@ -156,6 +161,50 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             lineRoute[2] = new Point(lineRoute[3].x, (int) centerY);
         }
     }
+
+    /**
+     * Add all Rects to the the selectionBounds array
+     */
+    private void setBounds() {
+        for (int i = 0; i < selectionBounds.length; i++)
+            selectionBounds[i] = selectionRectFromPoints(lineRoute[i], lineRoute[i + 1]);
+    }
+
+    /**
+     * This Rect will be used for selecting
+     * These two Points MUST be directly horizontal or vertical to each other
+     *
+     * @param a Point to be used in the Rect
+     * @param b another Paint to be used in the Rect
+     * @return a Rect containing the two points with padding (SELECT_PADDING), or null if these
+     * Points are not directly horizontal or vertical to each other
+     */
+    private Rect selectionRectFromPoints(Point a, Point b) {
+        int left;
+        int top;
+        int right;
+        int bottom;
+
+        if (a.x == b.x) { //the points are vertical to each other
+
+            top = (a.y < b.y) ? a.y : b.y;
+            bottom = (a.y > b.y) ? a.y : b.y;
+            left = a.x - SELECT_PADDING;
+            right = a.x + SELECT_PADDING;
+            return new Rect(left, top, right, bottom);
+
+        } else if (a.y == b.y) { //the points are horizontal to each other
+
+            top = a.y - SELECT_PADDING;
+            bottom = a.y + SELECT_PADDING;
+            left = (a.x < b.x) ? a.x : b.x;
+            right = (a.x > b.x) ? a.x : b.x;
+
+            return new Rect(left, top, right, bottom);
+
+        } else return null;
+    }
+
 
     /**
      * Json representation of this ClassDiagArrow

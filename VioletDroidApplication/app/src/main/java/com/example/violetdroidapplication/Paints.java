@@ -88,7 +88,7 @@ public final class Paints {
      */
     public static Paint getDefaultArrowPaint(boolean selected) {
         defaultArrowPaint.setColor(selected ? Color.BLUE : Color.BLACK);
-        defaultArrowPaint.setStrokeWidth(selected ? 5 : 3);
+        defaultArrowPaint.setStrokeWidth(selected ? 10 : 3);
 
         return defaultArrowPaint;
     }

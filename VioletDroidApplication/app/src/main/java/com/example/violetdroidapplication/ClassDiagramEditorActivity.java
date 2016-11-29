@@ -290,28 +290,28 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 ClassDiagShape start, end;
 
                 showToast(R.string.arrow_start);
-                editorView.waitingForArrowInput = true;
-                while (editorView.waitingForArrowInput) {
+                editorView.setWaitingForArrowInput(true);
+                while (editorView.isWaitingForArrowInput()) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                            /* do nothing */
+                        /* do nothing */
                     }
                 }
 
-                start = editorView.newArrowHelper;
+                start = editorView.getNewArrowHelper();
 
                 showToast(R.string.arrow_end);
-                editorView.waitingForArrowInput = true;
-                while (editorView.waitingForArrowInput) {
+                editorView.setWaitingForArrowInput(true);
+                while (editorView.isWaitingForArrowInput()) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-                            /* do nothing */
+                        /* do nothing */
                     }
                 }
 
-                end = editorView.newArrowHelper;
+                end = editorView.getNewArrowHelper();
 
                 editorView.addDrawable(new ClassDiagArrow(start, end));
 
