@@ -167,4 +167,40 @@ public class ClassDiagNote extends ClassDiagShape {
         return this.outline.contains(x, y);
     }
 
+    /**
+     * @return a JSON representation of this ClassDiagItem
+     */
+    public JSONObject toJson() {
+        try {
+            JSONObject obj = new JSONObject();
+
+            obj.put(FileHelper.ITEM_TYPE_KEY, getClass().getName());
+            obj.put(FileHelper.LOC_X_KEY, this.x);
+            obj.put(FileHelper.LOC_Y_KEY, this.y);
+            obj.put("cdn_text", text);
+
+            return obj;
+
+        } catch (Exception e) {
+            Log.e(TAG, "toJson: ", e);
+            return null;
+        }
+    }
+
+    /**
+     * get a ClassDiagNote from a JSONObject
+     *
+     * @param obj JSONObject representation of a ClassDiagNote
+     * @return a ClassDiagNote of the given JSONObject
+     */
+    public static ClassDiagNote fromJson(JSONObject obj) {
+        try {
+            return new ClassDiagNote(obj.getString("cdn_text"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
+                    (float) obj.getDouble(FileHelper.LOC_Y_KEY));
+        } catch (Exception e) {
+            Log.e(TAG, "fromJson: ", e);
+            return null;
+        }
+    }
+
 }

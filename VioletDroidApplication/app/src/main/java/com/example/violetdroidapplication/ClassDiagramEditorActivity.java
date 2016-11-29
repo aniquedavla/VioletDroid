@@ -159,6 +159,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             for (int i = 0; i < arr.length(); i++) {
                 if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
                     editorView.addItem(ClassDiagItem.fromJson(arr.getJSONObject(i)));
+                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagNote.class.getName()))
+                    editorView.addNote(ClassDiagNote.fromJson(arr.getJSONObject(i)));
                 // todo::if it's an arrow then ArrowsList.add the item
             }
 

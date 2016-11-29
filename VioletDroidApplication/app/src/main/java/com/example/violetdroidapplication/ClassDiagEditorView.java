@@ -373,23 +373,14 @@ public class ClassDiagEditorView extends View {
         inputHolders.setOrientation(LinearLayout.VERTICAL);
         final EditText inputTextView = new EditText(ctx); //this EditText will lie inside the AlertDialog
         inputTextView.setHint(R.string.note_enter_text_hint);
-//        inputTitleView.setSingleLine();
-//        final EditText inputAttrsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
-//        inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
-//        final EditText inputMethodsView = new EditText(ctx); //this EditText will lie inside the AlertDialog
-//        inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
 
         //if we're editing a note, populate the dialog with the current contents
         if (editingNote) {
             inputTextView.setText(((ClassDiagNote)selected).getText());
-//            inputAttrsView.setText(selected.getAttributes());
-//            inputMethodsView.setText(selected.getMethods());
             inputTextView.selectAll();
         }
 
         inputHolders.addView(inputTextView);
-//        inputHolders.addView(inputAttrsView);
-//        inputHolders.addView(inputMethodsView);
 
         //create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
@@ -401,15 +392,8 @@ public class ClassDiagEditorView extends View {
             public void onClick(DialogInterface dialog, int which) {
                 if (editingNote) { //if we're editing a note, just update the contents
                     ((ClassDiagNote)selected).setText(inputTextView.getText().toString());
-//                            inputAttrsView.getText().toString(),
-//                            inputMethodsView.getText().toString());
                 } else {
-                    // we are creating a new item
-
-                    // 100, 100 in the following line is an arbitrary point
                     selected = new ClassDiagNote(inputTextView.getText().toString(), 100, 100);
-//                            inputAttrsView.getText().toString(),
-//                            inputMethodsView.getText().toString(), 100, 100); //add a new item AND select it
 
                     Log.i(TAG, "Creating note: " + selected);
 
@@ -440,10 +424,20 @@ public class ClassDiagEditorView extends View {
     }
 
     /**
+     * Adds note to diagram when loading saved file
+     *
+     * @param cdn
+     */
+    public void addNote(ClassDiagNote cdn) {
+        mClassNotes.add(cdn);
+        postInvalidate();
+    }
+
+    /**
      * @return true if this working area is empty, false otherwise
      */
     public boolean isEmpty() {
-        return this.mClassItems.isEmpty();
+        return (this.mClassItems.isEmpty() && this.mClassNotes.isEmpty());
     }
 
     /**
@@ -454,6 +448,9 @@ public class ClassDiagEditorView extends View {
             JSONArray arr = new JSONArray();
             for (ClassDiagItem currItem : mClassItems)
                 arr.put(currItem.toJson());
+
+            for (ClassDiagNote currNote : mClassNotes)
+                arr.put(currNote.toJson());
 
             JSONObject obj = new JSONObject();
             obj.put(FileHelper.FILE_TYPE_KEY, FILE_TYPE);
@@ -488,6 +485,7 @@ public class ClassDiagEditorView extends View {
      */
     public void resetSpace() {
         mClassItems.clear();
+        mClassNotes.clear();
         selected = null;
 
         //todo::add arrowsList.clear()
