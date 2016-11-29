@@ -1,0 +1,13 @@
+Issues list: Maybe
+
+Are these all the issues that remain to keep each team member busy for the remainder of the project?
+
+The project builds and works: Ok
+
+Status page: Ok
+
+Commits:
+
+Should have more incremental commits
+
+
