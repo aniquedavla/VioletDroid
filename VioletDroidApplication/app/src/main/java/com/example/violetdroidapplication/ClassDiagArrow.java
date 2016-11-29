@@ -21,18 +21,19 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private ClassDiagShape fromShape;
     private ClassDiagShape toShape;
 
-//    private Point fromPoint;
-//    private Point toPoint;
-
+    //represents the
     private Point[] lineRoute; //this does not need to be saved [json]
     private Directions direction;
+
+    private Rect bounds; //used for selection
 
     //todo::add arrow type (enum?)
 
     /**
      * Create a new ClassDiagArrow with the given attributes
+     *
      * @param fromShape where the ClassDiagArrow should point from
-     * @param toShape where the ClassDiagArrow should point to
+     * @param toShape   where the ClassDiagArrow should point to
      */
     public ClassDiagArrow(ClassDiagShape fromShape, ClassDiagShape toShape) {
         this.fromShape = fromShape;
@@ -42,7 +43,8 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     /**
      * Draw this ClassDiagArrow to a given Canvas
-     * @param c Canvas on which to draw the ClassDiagArrow
+     *
+     * @param c        Canvas on which to draw the ClassDiagArrow
      * @param selected if the ClassDiagArrow is selected, changes the appearance
      */
     public void draw(Canvas c, boolean selected) {
@@ -59,15 +61,14 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     /**
      * Check this ClassDiagArrow "contains" the given point
+     *
      * @param x coordinate of the point
      * @param y coordinate of the point
      * @return true if the given point is contained, false otherwise
      */
     @Override
     public boolean contains(int x, int y) {
-
         return false;
-
     }
 
     /**
@@ -158,6 +159,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     /**
      * Json representation of this ClassDiagArrow
+     *
      * @return a JSONObject containing all the information needed to save and load
      */
     @Override
@@ -179,7 +181,8 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     /**
      * Get a ClassDiagArrow from a saved JSONObject representing a ClassDiagArrow
-     * @param jsonObject representing a ClassDiagArrow
+     *
+     * @param jsonObject     representing a ClassDiagArrow
      * @param alldrDrawables all possible shapes this ClassDiagArrow can point to/from
      * @return a new ClassDiagArrow
      */
@@ -193,7 +196,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             ClassDiagShape endShape = null;
 
             for (ClassDiagramDrawable shape : alldrDrawables) {
-                if(shape instanceof ClassDiagShape) {
+                if (shape instanceof ClassDiagShape) {
                     if (shape.toString().equals(startShapeStr)) startShape = (ClassDiagShape) shape;
                     if (shape.toString().equals(endShapeStr)) endShape = (ClassDiagShape) shape;
                 }
@@ -202,7 +205,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             //return a new arrow if we found both the items
             return (startShape == null || endShape == null) ? null
                     : new ClassDiagArrow(startShape, endShape);
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, "fromJson: ", e);
             return null;
         }

@@ -39,10 +39,6 @@ public class ClassDiagEditorView extends View {
     private static final String TAG = "ClassDiagEditorView";
 
     //Items: everything here needs to be saved/loaded
-//    private ArrayList<ClassDiagItem> mClassItems;
-//    private ArrayList<ClassDiagNote> mClassNotes;
-//    private ArrayList<ClassDiagArrow> mClassArrows;
-
     private ArrayList<ClassDiagramDrawable> allClassDrawables;
 
     private ClassDiagramDrawable selected = null; //null means none are selected
@@ -88,9 +84,6 @@ public class ClassDiagEditorView extends View {
         super(ctx, attrs);
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
-//        mClassItems = new ArrayList<>();
-//        mClassNotes = new ArrayList<>();
-//        mClassArrows = new ArrayList<>();
         allClassDrawables = new ArrayList<>();
 
         handler = new Handler();
@@ -179,33 +172,6 @@ public class ClassDiagEditorView extends View {
         for (ClassDiagramDrawable drawable : allClassDrawables)
             drawable.draw(canvas, selected == drawable);
 
-//        for (ClassDiagItem item : mClassItems) {
-//            if (selected != null) {
-//                if (selected.equals(item)) {
-//                    item.draw(canvas, true);
-//                } else {
-//                    item.draw(canvas, false);
-//                }
-//            } else {
-//                item.draw(canvas, false);
-//            }
-//        }
-
-//        for (ClassDiagNote note : mClassNotes) {
-//            if (selected != null) {
-//                if (selected.equals(note)) {
-//                    note.draw(canvas, true);
-//                } else {
-//                    note.draw(canvas, false);
-//                }
-//            } else {
-//                note.draw(canvas, false);
-//            }
-//        }
-
-//        for (ClassDiagArrow arrow : mClassArrows)
-//            arrow.draw(canvas, );
-
         if (numColumns == 0 || numRows == 0)
             return;
 
@@ -265,7 +231,7 @@ public class ClassDiagEditorView extends View {
                 // code for handling short taps
                 if (Math.abs(event.getX() - x) <= 2 && !isLongPressed) {
                     Log.i(TAG, "onTouchEvent: ACTION_UP - is a tap");
-                    // unselect item
+                    // deselect item
                     if (selected != null) {
                         if (selected.equals(findItem(x, y))) {
                             selected = null;
@@ -309,14 +275,6 @@ public class ClassDiagEditorView extends View {
      */
     public ClassDiagramDrawable findItem(int x, int y) {
         Log.i(TAG, "findItem");
-//        for (ClassDiagItem item : mClassItems)
-//            if (item.contains(x, y))
-//                return item;
-
-//        for (ClassDiagNote note : mClassNotes) {
-//            if (note.contains(x, y))
-//                return note;
-//        }
 
         for (ClassDiagramDrawable drawable : allClassDrawables)
             if (drawable.contains(x, y))
@@ -379,8 +337,7 @@ public class ClassDiagEditorView extends View {
                             inputAttrsView.getText().toString(),
                             //add new item AND select it
                             inputMethodsView.getText().toString(), 100, 100);
-//                    mClassItems.add(((ClassDiagItem) selected));
-                    allClassDrawables.add(((ClassDiagItem) selected));
+                    allClassDrawables.add(selected);
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -433,7 +390,6 @@ public class ClassDiagEditorView extends View {
 
                     Log.i(TAG, "Creating note: " + selected);
 
-//                    mClassNotes.add(((ClassDiagNote) selected));
                     allClassDrawables.add(((ClassDiagNote) selected));
                 }
 
@@ -450,37 +406,6 @@ public class ClassDiagEditorView extends View {
         builder.show(); //show the AlertDialog
     }
 
-//    public void addArrow() {
-//        if (selected == null) {
-//
-//        } else Toast.makeText(ctx, R.string.arrow_deselect, Toast.LENGTH_LONG).show();
-//    }
-
-//    private void showToast(int resId) {
-//
-//        Toast.makeText(ctx, resId, Toast.LENGTH_LONG).show();
-//    }
-
-    /**
-     * To be used when loading a saved state
-     *
-     * @param cdi ClassDiagItem item to add
-     */
-//    public void addItem(ClassDiagItem cdi) {
-//        mClassItems.add(cdi);
-//        mClassItems.add(cdi);
-//        postInvalidate();
-//    }
-
-    /**
-     * Adds note to diagram when loading saved file
-     *
-     * @param cdn ClassDiagNote to add
-     */
-//    public void addNote(ClassDiagNote cdn) {
-//        mClassNotes.add(cdn);
-//        postInvalidate();
-//    }
     public void addDrawable(ClassDiagramDrawable drawable) {
         allClassDrawables.add(drawable);
         postInvalidate();
@@ -508,11 +433,6 @@ public class ClassDiagEditorView extends View {
     public JSONObject toJson() {
         try {
             JSONArray arr = new JSONArray();
-//            for (ClassDiagItem currItem : mClassItems)
-//                arr.put(currItem.toJson());
-
-//            for (ClassDiagNote currNote : mClassNotes)
-//                arr.put(currNote.toJson());
             for (ClassDiagramDrawable drawable : allClassDrawables)
                 arr.put(drawable.toJson());
 
@@ -548,8 +468,6 @@ public class ClassDiagEditorView extends View {
      * THIS SHOULD ONLY BE CALLED AFTER USER'S CONSENT
      */
     public void resetSpace() {
-//        mClassItems.clear();
-//        mClassNotes.clear();
         allClassDrawables.clear();
         selected = null;
 
@@ -562,11 +480,6 @@ public class ClassDiagEditorView extends View {
      */
     public void deleteItem() {
         if (selected != null) {
-//            if (selected instanceof ClassDiagItem)
-//                mClassItems.remove(selected);
-//            else if (selected instanceof ClassDiagNote)
-//                mClassNotes.remove(selected);
-
             allClassDrawables.remove(selected);
             savePending = true; //if an item is deleted, a save is pending
             selected = null; //now nothing is selected
