@@ -14,9 +14,11 @@ public final class Paints {
     private static Paint defaultTextTitlePaint;
     private static Paint defaultOutlinePaint;
     private static Paint defaultBgPaint;
+    private static Paint defaultBgNotePaint;
     private static Paint defaultArrowPaint;
 
     private static final int SELECTED_BG_PAINT = Color.parseColor("#DBE9F9");  // color of selected item
+    private static final int DEFAULT_NOTE_COLOR = Color.parseColor("#FFFFBB");  // color of selected item
 
     /**
      * Private constructor to make checkstyle happy
@@ -46,6 +48,10 @@ public final class Paints {
         defaultBgPaint = new Paint();
         defaultBgPaint.setStrokeWidth(0);
         defaultBgPaint.setStyle(Paint.Style.FILL);
+
+        defaultBgNotePaint = new Paint();
+        defaultBgNotePaint.setStrokeWidth(0);
+        defaultBgNotePaint.setStyle(Paint.Style.FILL);
 
         defaultArrowPaint = new Paint();
         defaultArrowPaint.setStrokeWidth(3);
@@ -81,6 +87,15 @@ public final class Paints {
         defaultBgPaint.setColor(selected ? SELECTED_BG_PAINT : Color.WHITE);
 
         return defaultBgPaint;
+    }
+
+    /**
+     * @param selected changes background color to blue if true, light yellow otherwise
+     * @return the default Paint to be used with the background of a note
+     */
+    public static Paint getDefaultBgNotePaint(boolean selected) {
+        defaultBgNotePaint.setColor(selected ? SELECTED_BG_PAINT : DEFAULT_NOTE_COLOR);
+        return defaultBgNotePaint;
     }
 
     /**

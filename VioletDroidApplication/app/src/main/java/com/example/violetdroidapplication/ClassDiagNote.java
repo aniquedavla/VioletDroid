@@ -2,6 +2,8 @@ package com.example.violetdroidapplication;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -24,9 +26,9 @@ public class ClassDiagNote extends ClassDiagShape {
     /**
      * Create a new ClassDiagNote
      *
-     * @param text       the text in the note
-     * @param x          coordinate to place this item
-     * @param y          coordinate to place this item
+     * @param text the text in the note
+     * @param x    coordinate to place this item
+     * @param y    coordinate to place this item
      */
     public ClassDiagNote(String text, float x, float y) {
         this.text = text;
@@ -110,13 +112,49 @@ public class ClassDiagNote extends ClassDiagShape {
         bounds.bottom = bounds.top + calcMaxHeight();
         outline = bounds;
 
-        //draw the rectangle outline
-        c.drawRect(bounds, Paints.getDefaultOutlinePaint());
-        //then draw the rectangle background
-        c.drawRect(bounds, Paints.getDefaultBgPaint(selected));
+        Point[] clippedOutline = getFoldPoints(bounds);
+
+        Path bgPath = new Path();
+        bgPath.moveTo(clippedOutline[0].x, clippedOutline[0].y);
+
+        //draw the clipped outline
+        for (int i = 1; i < clippedOutline.length; i++) {
+            c.drawLine(clippedOutline[i - 1].x, clippedOutline[i - 1].y, clippedOutline[i].x,
+                    clippedOutline[i].y, Paints.getDefaultOutlinePaint());
+
+            bgPath.lineTo(clippedOutline[i].x, clippedOutline[i].y);
+        }
+        //manually close the last to the first
+        c.drawLine(clippedOutline[clippedOutline.length - 1].x,
+                clippedOutline[clippedOutline.length - 1].y, clippedOutline[0].x,
+                clippedOutline[0].y, Paints.getDefaultOutlinePaint());
+        bgPath.lineTo(clippedOutline[0].x, clippedOutline[0].y);
+
+        bgPath.close();
+        c.drawPath(bgPath, Paints.getDefaultBgNotePaint(selected));
 
         //draw the text
         drawMultiLineText(text, c, Paints.getDefaultTextPaint(), x, y, PADDING, bounds);
+    }
+
+    /**
+     * Convert a Rect to a set of points that form the shape of a folded note (little triangle
+     * is clipped off the top right hand corner)
+     *
+     * @param bounds to convert
+     * @return a set of Points with length of 5, [0] refers to top left, goes counter clockwise
+     */
+    public Point[] getFoldPoints(Rect bounds) {
+        Point[] result = new Point[5];
+        int clipped = (int) (bounds.height() * 0.2);
+
+        result[0] = new Point(bounds.left, bounds.top);
+        result[1] = new Point(bounds.left, bounds.bottom);
+        result[2] = new Point(bounds.right, bounds.bottom);
+        result[3] = new Point(bounds.right, bounds.top + clipped);
+        result[4] = new Point(bounds.right - clipped, bounds.top);
+
+        return result;
     }
 
     /**
