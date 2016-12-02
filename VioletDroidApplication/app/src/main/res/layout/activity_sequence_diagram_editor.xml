@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.violetdroidapplication.ClassDiagramEditorActivity">
+    tools:context="com.example.violetdroidapplication.SequenceDiagramEditorActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -21,14 +21,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/class_diag_editor_plus"
+                android:id="@+id/seq_diag_editor_plus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="CLASS"
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_file"
+                android:id="@+id/seq_diag_editor_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -36,7 +36,7 @@
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_arrow"
+                android:id="@+id/seq_diag_editor_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -44,7 +44,7 @@
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_btn4"
+                android:id="@+id/seq_diag_editor_btn4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Button 4"
@@ -66,21 +66,21 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/class_diag_editor_btn5"
+                android:id="@+id/seq_diag_editor_btn5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Button5"
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_bnt6"
+                android:id="@+id/seq_diag_editor_bnt6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Button 6"
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_note"
+                android:id="@+id/seq_diag_editor_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -88,7 +88,7 @@
                 style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_delete"
+                android:id="@+id/seq_diag_editor_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -101,7 +101,7 @@
     </LinearLayout>
 
     <com.example.violetdroidapplication.ClassDiagEditorView
-        android:id="@+id/class_diag_editor_view"
+        android:id="@+id/seq_diag_editor_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

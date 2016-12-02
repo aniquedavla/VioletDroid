@@ -36,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ((Button) findViewById(R.id.main_sequence_editor_button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editorIntent = new Intent(MainActivity.this, SequenceDiagramEditorActivity.class);
+                startActivity(editorIntent);
+            }
+        });
+
 
     }
 }
