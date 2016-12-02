@@ -24,27 +24,31 @@
                 android:id="@+id/class_diag_editor_plus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CLASS" />
+                android:text="CLASS"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_save"
+                android:id="@+id/class_diag_editor_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/save" />
+                android:text="@string/file"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_save_as"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save_as" />
-
-            <Button
-                android:id="@+id/class_diag_editor_load"
+                android:id="@+id/class_diag_editor_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/load" />
+                android:text="@string/arrow"
+                style="@style/Widget.AppCompat.Button.Colored" />
+
+            <Button
+                android:id="@+id/class_diag_editor_btn4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button 4"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
 
         </LinearLayout>
@@ -62,31 +66,34 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/class_diag_editor_export"
+                android:id="@+id/class_diag_editor_btn5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/export" />
+                android:text="Button5"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
-                android:id="@+id/class_diag_editor_new"
+                android:id="@+id/class_diag_editor_bnt6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/new_str" />
+                android:text="Button 6"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
                 android:id="@+id/class_diag_editor_note"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="note" />
+                android:text="note"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
             <Button
                 android:id="@+id/class_diag_editor_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/delete" />
+                android:text="@string/delete"
+                style="@style/Widget.AppCompat.Button.Colored" />
 
 
         </LinearLayout>
