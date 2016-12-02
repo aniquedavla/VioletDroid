@@ -33,4 +33,11 @@ public abstract class ClassDiagShape implements ClassDiagramDrawable {
     public boolean contains(int x, int y) {
         return this.outline.contains(x, y);
     }
+
+    /**
+     * @return the Rect that defines this Shape
+     */
+    public Rect getOutline() {
+        return this.outline;
+    }
 }
