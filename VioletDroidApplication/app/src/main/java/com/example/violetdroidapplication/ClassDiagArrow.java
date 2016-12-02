@@ -16,7 +16,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     private static final String TAG = "ClassDiagArrow";
 
-    private enum Directions { HVH, VHV }
+    private enum ArrDirections { HVH, VHV, SELF }
 
     //how far the user can click away from an arrow to select it
     private static final int SELECT_PADDING = 10;
@@ -25,8 +25,8 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private ClassDiagShape toShape;
 
     //represents the
-    private Point[] lineRoute; //this does not need to be saved [json]
-    private Directions direction;
+    private Point[] linePoints; //this does not need to be saved [json]
+    private ArrDirections direction;
 
     private Rect[] selectionBounds; //used for selection
 
@@ -41,8 +41,14 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     public ClassDiagArrow(ClassDiagShape fromShape, ClassDiagShape toShape) {
         this.fromShape = fromShape;
         this.toShape = toShape;
-        this.lineRoute = new Point[4];
-        selectionBounds = new Rect[lineRoute.length - 1];
+
+        if (fromShape == toShape) direction = ArrDirections.SELF;
+        //else we determine arrow direction at draw time
+
+        //if the arrow points to itself, 5 points determine the arrow, otherwise, 4 points
+        //this is because a self-pointing arrow has 4 segments, all other arrows have 3 segments
+        linePoints = new Point[fromShape == toShape ? 5 : 4];
+        selectionBounds = new Rect[linePoints.length - 1];
     }
 
     /**
@@ -52,13 +58,18 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      * @param selected if the ClassDiagArrow is selected, changes the appearance
      */
     public void draw(Canvas c, boolean selected) {
-        findConnectionPoints();
-        getIntermediatePoints();
-        setBounds();
+        if (direction == ArrDirections.SELF) {
+            calcSelfArrowPoints();
+        } else {
+            findConnectionPoints();
+            calcAllPoints();
+        }
+
+        setSelectionBounds();
 
         //draw lines
-        for (int i = 1; i < lineRoute.length; i++) {
-            c.drawLine(lineRoute[i - 1].x, lineRoute[i - 1].y, lineRoute[i].x, lineRoute[i].y,
+        for (int i = 1; i < linePoints.length; i++) {
+            c.drawLine(linePoints[i - 1].x, linePoints[i - 1].y, linePoints[i].x, linePoints[i].y,
                     Paints.getDefaultArrowPaint(selected));
         }
     }
@@ -100,23 +111,23 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
             if (deltaY < 0) { // to is ABOVE from
                 if (fromShape.outline.top < toShape.outline.bottom) {
-                    lineRoute[0] = fromConnectionPoints[0]; //use left
-                    lineRoute[3] = toConnectionPoints[2]; //use right
-                    direction = Directions.HVH;
+                    linePoints[0] = fromConnectionPoints[0]; //use left
+                    linePoints[3] = toConnectionPoints[2]; //use right
+                    direction = ArrDirections.HVH;
                 } else {
-                    lineRoute[0] = fromConnectionPoints[1]; //use top
-                    lineRoute[3] = toConnectionPoints[3]; //use bottom
-                    direction = Directions.VHV;
+                    linePoints[0] = fromConnectionPoints[1]; //use top
+                    linePoints[3] = toConnectionPoints[3]; //use bottom
+                    direction = ArrDirections.VHV;
                 }
             } else { //to is BELOW from
                 if (fromShape.outline.bottom > toShape.outline.top) {
-                    lineRoute[0] = fromConnectionPoints[0]; //use left
-                    lineRoute[3] = toConnectionPoints[2]; //use right
-                    direction = Directions.HVH;
+                    linePoints[0] = fromConnectionPoints[0]; //use left
+                    linePoints[3] = toConnectionPoints[2]; //use right
+                    direction = ArrDirections.HVH;
                 } else {
-                    lineRoute[0] = fromConnectionPoints[3]; //use bottom
-                    lineRoute[3] = toConnectionPoints[1]; //use top
-                    direction = Directions.VHV;
+                    linePoints[0] = fromConnectionPoints[3]; //use bottom
+                    linePoints[3] = toConnectionPoints[1]; //use top
+                    direction = ArrDirections.VHV;
                 }
             }
 
@@ -124,23 +135,23 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
             if (deltaY < 0) { // to is ABOVE from
                 if (fromShape.outline.top < toShape.outline.bottom) {
-                    lineRoute[0] = fromConnectionPoints[2]; //use right
-                    lineRoute[3] = toConnectionPoints[0]; //use left
-                    direction = Directions.HVH;
+                    linePoints[0] = fromConnectionPoints[2]; //use right
+                    linePoints[3] = toConnectionPoints[0]; //use left
+                    direction = ArrDirections.HVH;
                 } else {
-                    lineRoute[0] = fromConnectionPoints[1]; //use top
-                    lineRoute[3] = toConnectionPoints[3]; //use bottom
-                    direction = Directions.VHV;
+                    linePoints[0] = fromConnectionPoints[1]; //use top
+                    linePoints[3] = toConnectionPoints[3]; //use bottom
+                    direction = ArrDirections.VHV;
                 }
             } else { //to is BELOW from
                 if (fromShape.outline.bottom > toShape.outline.top) {
-                    lineRoute[0] = fromConnectionPoints[2]; //use right
-                    lineRoute[3] = toConnectionPoints[0]; //use left
-                    direction = Directions.HVH;
+                    linePoints[0] = fromConnectionPoints[2]; //use right
+                    linePoints[3] = toConnectionPoints[0]; //use left
+                    direction = ArrDirections.HVH;
                 } else {
-                    lineRoute[0] = fromConnectionPoints[3]; //use bottom
-                    lineRoute[3] = toConnectionPoints[1]; //use top
-                    direction = Directions.VHV;
+                    linePoints[0] = fromConnectionPoints[3]; //use bottom
+                    linePoints[3] = toConnectionPoints[1]; //use top
+                    direction = ArrDirections.VHV;
                 }
             }
         }
@@ -149,25 +160,48 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     /**
      * make the intermediate points between the start and the end
      */
-    private void getIntermediatePoints() {
-        float centerX = (lineRoute[0].x + lineRoute[3].x) / 2.0f;
-        float centerY = (lineRoute[0].y + lineRoute[3].y) / 2.0f;
+    private void calcAllPoints() {
+        float centerX = (linePoints[0].x + linePoints[3].x) / 2.0f;
+        float centerY = (linePoints[0].y + linePoints[3].y) / 2.0f;
 
-        if (direction == Directions.HVH) {
-            lineRoute[1] = new Point((int) centerX, lineRoute[0].y);
-            lineRoute[2] = new Point((int) centerX, lineRoute[3].y);
-        } else {
-            lineRoute[1] = new Point(lineRoute[0].x, (int) centerY);
-            lineRoute[2] = new Point(lineRoute[3].x, (int) centerY);
+        switch (direction) {
+            case HVH:
+                linePoints[1] = new Point((int) centerX, linePoints[0].y);
+                linePoints[2] = new Point((int) centerX, linePoints[3].y);
+                break;
+            case VHV:
+                linePoints[1] = new Point(linePoints[0].x, (int) centerY);
+                linePoints[2] = new Point(linePoints[3].x, (int) centerY);
+                break;
+            default:
+                break;
         }
     }
 
     /**
+     * Use this method to find all points that a self-pointing arrow should go through
+     */
+    private void calcSelfArrowPoints() {
+        int shapeWd = toShape.getOutline().width();
+        int shapeHt = toShape.getOutline().height();
+        Rect shapeBounds = toShape.getOutline();
+        int size = (int) (0.3f * (shapeWd > shapeHt ? shapeHt : shapeWd));
+
+        //the path of the self arrow
+        linePoints[0] = new Point(shapeBounds.right - size, shapeBounds.top);
+        linePoints[1] = new Point(shapeBounds.right - size, shapeBounds.top - size);
+        linePoints[2] = new Point(shapeBounds.right + size, shapeBounds.top - size);
+        linePoints[3] = new Point(shapeBounds.right + size, shapeBounds.top + size);
+        linePoints[4] = new Point(shapeBounds.right, shapeBounds.top + size);
+    }
+
+
+    /**
      * Add all Rects to the the selectionBounds array
      */
-    private void setBounds() {
+    private void setSelectionBounds() {
         for (int i = 0; i < selectionBounds.length; i++)
-            selectionBounds[i] = selectionRectFromPoints(lineRoute[i], lineRoute[i + 1]);
+            selectionBounds[i] = selectionRectFromPoints(linePoints[i], linePoints[i + 1]);
     }
 
     /**
