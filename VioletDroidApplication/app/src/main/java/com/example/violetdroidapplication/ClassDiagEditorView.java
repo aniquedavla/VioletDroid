@@ -338,6 +338,7 @@ public class ClassDiagEditorView extends View {
                             ((ClassDiagItem) selected).setTexts(inputTitleView.getText().toString(),
                                     inputAttrsView.getText().toString(),
                                     inputMethodsView.getText().toString());
+                            postInvalidate();
                             dialog.dismiss();
                         } else { // we are creating a new item
                             //check to see if the name already exists
