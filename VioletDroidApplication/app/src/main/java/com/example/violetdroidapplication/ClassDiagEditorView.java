@@ -291,13 +291,11 @@ public class ClassDiagEditorView extends View {
      */
     public void addOrEditItem() {
         Log.d(TAG, "addOrEditItem");
-
         //we are editing an item if we already have one selected, later on selected can be an arrow
         final boolean editingItem = (selected != null && selected instanceof ClassDiagItem);
-
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
-        //these EditTexts will lie insied the AlertDialog
+        //these EditTexts will lie inside the AlertDialog
         final EditText inputTitleView = new EditText(ctx);
         inputTitleView.setHint(R.string.class_diag_enter_title_hint);
         inputTitleView.setSingleLine();
@@ -305,57 +303,77 @@ public class ClassDiagEditorView extends View {
         inputAttrsView.setHint(R.string.class_diag_enter_attrs_hint);
         final EditText inputMethodsView = new EditText(ctx);
         inputMethodsView.setHint(R.string.class_diag_enter_methods_hint);
-
-        //if we're editing an item, populate the dialog with the current contents
-        if (editingItem) {
+        if (editingItem) { //if we're editing an item, populate the dialog with the current contents
             inputTitleView.setText(((ClassDiagItem) selected).getTitle());
             inputAttrsView.setText(((ClassDiagItem) selected).getAttributes());
             inputMethodsView.setText(((ClassDiagItem) selected).getMethods());
             inputTitleView.selectAll();
         }
-
         inputHolders.addView(inputTitleView);
         inputHolders.addView(inputAttrsView);
         inputHolders.addView(inputMethodsView);
-        //create the AlertDialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        AlertDialog builder = new AlertDialog.Builder(ctx).create();
         builder.setTitle(editingItem ? R.string.class_diag_edit_title
                 : R.string.class_diag_enter_title);
         builder.setView(inputHolders);
-        builder.setPositiveButton(R.string.ok_str, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (editingItem) { //if we're editing an item, just update the contents
-                    ((ClassDiagItem) selected).setTexts(inputTitleView.getText().toString(),
-                            inputAttrsView.getText().toString(),
-                            inputMethodsView.getText().toString());
-                } else {
-                    // we are creating a new item
-
-                    // 100, 100 in the following line is an arbitrary point
-                    selected = new ClassDiagItem(inputTitleView.getText().toString(),
-                            inputAttrsView.getText().toString(),
-                            //add new item AND select it
-                            inputMethodsView.getText().toString(), 100, 100);
-                    allClassDrawables.add(selected);
+        builder.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.done_str),
+                (DialogInterface.OnClickListener) null); //OnClickListener overriden later
+        builder.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.cancel_str),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
                 }
-
-                savePending = true; //we've made changes to the editor
-                postInvalidate();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+        );
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            //using OnShowListener so we can keep the dialog shown if the same name alreay exists
+            public void onShow(final DialogInterface dialog) {
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (editingItem) { //if we're editing an item, just update the contents
+                            ((ClassDiagItem) selected).setTexts(inputTitleView.getText().toString(),
+                                    inputAttrsView.getText().toString(),
+                                    inputMethodsView.getText().toString());
+                            dialog.dismiss();
+                        } else { // we are creating a new item
+                            //check to see if the name already exists
+                            boolean sameNameExists = false;
+                            for (ClassDiagramDrawable shape : allClassDrawables) {
+                                if (shape instanceof ClassDiagItem && ((ClassDiagItem) shape).getTitle()
+                                        .equals(inputTitleView.getText().toString())) {
+                                    sameNameExists = true;
+                                    break;
+                                }
+                            }
+                            if (sameNameExists) //warn the user that there already exists an item with that name
+                                Toast.makeText(ctx, R.string.class_diag_err_name_exists, Toast.LENGTH_SHORT).show();
+                            else {
+                                // add the item
+                                // 100, 100 in the following line is an arbitrary point
+                                selected = new ClassDiagItem(inputTitleView.getText().toString(),
+                                        inputAttrsView.getText().toString(),
+                                        //add new item AND select it
+                                        inputMethodsView.getText().toString(), 100, 100);
+                                allClassDrawables.add(selected);
+                                dialog.dismiss();
+                            }
+                            savePending = true; //we've made changes to the editor
+                            postInvalidate();
+                        }
+                    }
+                });
             }
         });
-        builder.show(); //show the AlertDialog
+        builder.show();
     }
 
     /**
      * method used to add or edit a note
      */
+
     public void addOrEditNote() {
         Log.d(TAG, "addOrEditNote");
 
@@ -408,6 +426,7 @@ public class ClassDiagEditorView extends View {
 
     /**
      * Add a ClassDiagramDrawable to this View
+     *
      * @param drawable to add to this View
      */
     public void addDrawable(ClassDiagramDrawable drawable) {
@@ -433,6 +452,7 @@ public class ClassDiagEditorView extends View {
 
     /**
      * Get whether this View is waiting for an arrow input
+     *
      * @return waitingForArrowInput
      */
     public boolean isWaitingForArrowInput() {
@@ -441,6 +461,7 @@ public class ClassDiagEditorView extends View {
 
     /**
      * set this View's waitingForArrowInput
+     *
      * @param waitingForArrowInput new value to set
      */
     public void setWaitingForArrowInput(boolean waitingForArrowInput) {
@@ -449,6 +470,7 @@ public class ClassDiagEditorView extends View {
 
     /**
      * Get the object that the user tapped if waiting for an object
+     *
      * @return ClassDiagShape that the user tapped
      */
     public ClassDiagShape getNewArrowHelper() {

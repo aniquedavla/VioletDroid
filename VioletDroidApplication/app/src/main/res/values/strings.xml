@@ -9,6 +9,8 @@
     <string name="class_diag_enter_attrs_hint">Attributes</string>
     <string name="class_diag_enter_methods_hint">Methods</string>
     <string name="class_diag_err_missing_title">The Class Diagram Item must have a title that is not blank.</string>
+    <string name="class_diag_err_name_exists">A Class item with that name already exists.
+            Please choose a new name.</string>
 
     <!--Notes-->
     <string name="note_enter_title">Enter Note Text</string>
