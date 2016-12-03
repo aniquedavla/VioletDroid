@@ -16,7 +16,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     private static final String TAG = "ClassDiagArrow";
 
-    private enum ArrDirections { HVH, VHV, SELF }
+    private enum ArrDirections {HVH, VHV, SELF}
 
     //how far the user can click away from an arrow to select it
     private static final int SELECT_PADDING = 10;
@@ -239,6 +239,15 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         } else return null;
     }
 
+    /**
+     * Check to see if this arrow points to or from a given object
+     *
+     * @param drawable to check
+     * @return true if the Shape points to/from the object, false otherwise
+     */
+    public boolean reliesOn(ClassDiagramDrawable drawable) {
+        return drawable == this.fromShape || drawable == this.toShape;
+    }
 
     /**
      * Json representation of this ClassDiagArrow

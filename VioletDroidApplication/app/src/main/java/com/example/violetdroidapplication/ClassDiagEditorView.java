@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -21,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by vishaalprasad on 10/27/16.
@@ -530,9 +532,22 @@ public class ClassDiagEditorView extends View {
      */
     public void deleteItem() {
         if (selected != null) {
+            //if the selected item is a ClassDiagShape, it might have an arrow pointing to it
+            if (selected instanceof ClassDiagShape) {
+                Iterator<ClassDiagramDrawable> iterator = allClassDrawables.iterator();
+                //check all the items and see if there's an arrow pointing to the item we just removed
+                while (iterator.hasNext()) {
+                    ClassDiagramDrawable drawable = iterator.next();
+                    if (drawable instanceof ClassDiagArrow) {
+                        ClassDiagArrow arrow = (ClassDiagArrow) drawable;
+                        if (arrow.reliesOn(selected)) iterator.remove();
+                    }
+                }
+            }
             allClassDrawables.remove(selected);
             savePending = true; //if an item is deleted, a save is pending
-            selected = null; //now nothing is selected
+            selected = null; //now nothin
+            // g is selected
             draggable = false;
         }
 
