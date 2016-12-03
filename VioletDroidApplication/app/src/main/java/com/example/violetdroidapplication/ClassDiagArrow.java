@@ -16,7 +16,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     private static final String TAG = "ClassDiagArrow";
 
-    private enum ArrDirections {HVH, VHV, SELF}
+    private enum ArrDirections { HVH, VHV, SELF }
 
     //how far the user can click away from an arrow to select it
     private static final int SELECT_PADDING = 10;
