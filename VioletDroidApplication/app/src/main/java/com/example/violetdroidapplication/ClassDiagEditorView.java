@@ -383,6 +383,7 @@ public class ClassDiagEditorView extends View {
         final boolean editingNote = (selected != null && selected instanceof ClassDiagNote);
 
         final LinearLayout inputHolders = new LinearLayout(ctx);
+        inputHolders.setPadding(10, 0, 10, 0);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
         final EditText inputTextView = new EditText(ctx);
         inputTextView.setHint(R.string.note_enter_text_hint);
@@ -468,6 +469,13 @@ public class ClassDiagEditorView extends View {
      */
     public void setWaitingForArrowInput(boolean waitingForArrowInput) {
         this.waitingForArrowInput = waitingForArrowInput;
+    }
+
+    /**
+     * @return the ClassDiagramDrawable that is currently selected, null if nothing is selected
+     */
+    public ClassDiagramDrawable getSelected() {
+        return selected;
     }
 
     /**

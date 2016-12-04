@@ -314,7 +314,7 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
 
                 end = editorView.getNewArrowHelper();
 
-                editorView.addDrawable(new ClassDiagArrow(start, end));
+//                editorView.addDrawable(new ClassDiagArrow(start, end));
 
             }
         });

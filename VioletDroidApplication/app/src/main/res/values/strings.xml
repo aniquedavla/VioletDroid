@@ -59,6 +59,23 @@
     <string name="new_class_diagram_dialod_body">Reset the working area and make a new class diagram?</string>
 
     <!--Arrow-->
+    <string name="arrow_dialog_title">Arrow Properties</string>
+    <string name="arrow_start_head">Start Head Type</string>
+    <string name="arrow_end_head">End Head Type</string>
+    <string name="arrow_line_style">Line Style</string>
+    <string-array name="arr_head_types">
+        <item>Empty</item>
+        <item>V</item>
+        <item>Triangle Outline</item>
+        <item>Triangle Filled</item>
+        <item>Diamond Outline</item>
+        <item>Diamond Filled</item>
+    </string-array>
+    <string-array name="arr_line_types">
+        <item>Solid</item>
+        <item>Dashed</item>
+    </string-array>
+
     <string name="arrow">Arrow</string>
     <string name="arrow_start">Tap the item where the arrow should start from.</string>
     <string name="arrow_end">Tap the item where the arrow should end.</string>

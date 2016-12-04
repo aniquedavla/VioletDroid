@@ -1,6 +1,7 @@
 package com.example.violetdroidapplication;
 
 import android.graphics.Canvas;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -14,36 +15,50 @@ import java.util.List;
  */
 public class ClassDiagArrow implements ClassDiagramDrawable {
 
+    /**
+     * possible arrow head types
+     */
+    public enum ArrHeadType { EMPTY, V, TRIANGLE, FILLED_TRIANGLE, DIAMOND, FILLED_DIAMOND }
+
     private static final String TAG = "ClassDiagArrow";
 
-    private enum ArrDirections { HVH, VHV, SELF }
+    private enum ArrDirections { HVH, VHV, SELF } //calculated automatically, user can not set this
 
     //how far the user can click away from an arrow to select it
-    private static final int SELECT_PADDING = 10;
+    private static final int SELECT_PADDING = 20;
+    private final int ARROW_LENGTH = 20;
+    private final double ARROW_ANGLE = Math.PI / 6f;
 
+    //this information needs to be saved
     private ClassDiagShape fromShape;
     private ClassDiagShape toShape;
+    private boolean solid;
+    private ArrHeadType startHead;
+    private ArrHeadType endHead;
+    //todo::add option for unbent arrow (different class, logic is very different)
 
-    //represents the
+    //represents the points that define the line s
     private Point[] linePoints; //this does not need to be saved [json]
     private ArrDirections direction;
 
     private Rect[] selectionBounds; //used for selection
-
-    //todo::add arrow type (enum?)
 
     /**
      * Create a new ClassDiagArrow with the given attributes
      *
      * @param fromShape where the ClassDiagArrow should point from
      * @param toShape   where the ClassDiagArrow should point to
+     * @param solid     true for solid line arrow, false for dashed
+     * @param startHead the type of arrowhead to be used at the start of the arrow
+     * @param endHead   the type of arrowhead to be used at the end of an arrow
      */
-    public ClassDiagArrow(ClassDiagShape fromShape, ClassDiagShape toShape) {
+    public ClassDiagArrow(ClassDiagShape fromShape, ClassDiagShape toShape, boolean solid,
+                          ArrHeadType startHead, ArrHeadType endHead) {
         this.fromShape = fromShape;
         this.toShape = toShape;
-
-        if (fromShape == toShape) direction = ArrDirections.SELF;
-        //else we determine arrow direction at draw time
+        this.solid = solid;
+        this.startHead = startHead;
+        this.endHead = endHead;
 
         //if the arrow points to itself, 5 points determine the arrow, otherwise, 4 points
         //this is because a self-pointing arrow has 4 segments, all other arrows have 3 segments
@@ -58,6 +73,10 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      * @param selected if the ClassDiagArrow is selected, changes the appearance
      */
     public void draw(Canvas c, boolean selected) {
+        if (fromShape == null || toShape == null) return;
+
+        if (fromShape == toShape) this.direction = ArrDirections.SELF;
+
         if (direction == ArrDirections.SELF) {
             calcSelfArrowPoints();
         } else {
@@ -68,10 +87,62 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         setSelectionBounds();
 
         //draw lines
-        for (int i = 1; i < linePoints.length; i++) {
-            c.drawLine(linePoints[i - 1].x, linePoints[i - 1].y, linePoints[i].x, linePoints[i].y,
-                    Paints.getDefaultArrowPaint(selected));
+        Path pathLines = new Path();
+        pathLines.moveTo(linePoints[0].x, linePoints[0].y);
+        for (int i = 1; i < linePoints.length; i++)
+            pathLines.lineTo(linePoints[i].x, linePoints[i].y);
+        c.drawPath(pathLines, Paints.getDefaultArrowPaint(selected, this.solid));
+
+        drawArrowHead(c, selected, this.startHead, linePoints[0], linePoints[1]);
+        drawArrowHead(c, selected, this.endHead,
+                linePoints[linePoints.length - 1], linePoints[linePoints.length - 2]);
+    }
+
+    /**
+     * Draw an arrow head
+     *
+     * @param c              Canvas used for drawing
+     * @param selected       if this arrow is selected
+     * @param headType       type of arrow head to be drawn
+     * @param location       where the arrow points exactly
+     * @param directionPoint another point used to determine direction
+     */
+    private void drawArrowHead(Canvas c, boolean selected, ArrHeadType headType, Point location, Point directionPoint) {
+        if (headType == ArrHeadType.EMPTY) return;
+
+        float dx = location.x - directionPoint.x;
+        float dy = location.y - directionPoint.y;
+
+        double angle = Math.atan2(dy, dx);
+
+        float x1 = (float) (location.x - ARROW_LENGTH * Math.cos(angle + ARROW_ANGLE));
+        float y1 = (float) (location.y - ARROW_LENGTH * Math.sin(angle + ARROW_ANGLE));
+        float x2 = (float) (location.x - ARROW_LENGTH * Math.cos(angle - ARROW_ANGLE));
+        float y2 = (float) (location.y - ARROW_LENGTH * Math.sin(angle - ARROW_ANGLE));
+
+        Path outlinePath = new Path();
+        outlinePath.moveTo(location.x, location.y);
+        outlinePath.lineTo(x1, y1);
+        boolean fill = (headType == ArrHeadType.FILLED_DIAMOND
+                || headType == ArrHeadType.FILLED_TRIANGLE);
+
+        if (headType == ArrHeadType.V) {
+            outlinePath.moveTo(x2, y2);
+            outlinePath.lineTo(location.x, location.y);
+        } else if (headType == ArrHeadType.TRIANGLE || headType == ArrHeadType.FILLED_TRIANGLE) {
+            outlinePath.lineTo(x2, y2);
+            outlinePath.close();
+        } else if (headType == ArrHeadType.DIAMOND || headType == ArrHeadType.FILLED_DIAMOND) {
+            float x3 = (float) (x2 - ARROW_LENGTH * Math.cos(angle + ARROW_ANGLE));
+            float y3 = (float) (y2 - ARROW_LENGTH * Math.sin(angle + ARROW_ANGLE));
+            outlinePath.lineTo(x3, y3);
+            outlinePath.lineTo(x2, y2);
+            outlinePath.close();
         }
+
+        c.drawPath(outlinePath, Paints.getDefaultArrowPaint(selected, true));
+        c.drawPath(outlinePath, Paints.getDefaultArrowHeadFillPaint(selected, fill));
+
     }
 
     /**
@@ -83,7 +154,12 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      */
     @Override
     public boolean contains(int x, int y) {
-        for (Rect rect : selectionBounds) if (rect.contains(x, y)) return true;
+        if (selectionBounds == null) return false;
+
+        for (Rect currRect : selectionBounds) {
+            if (currRect != null && currRect.contains(x, y)) return true;
+        }
+
         return false;
     }
 
@@ -250,6 +326,68 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     }
 
     /**
+     * Set which shapes this arrow points to and from
+     *
+     * @param fromShape where this arrow should point from
+     * @param toShape   where this arrow should point to
+     */
+    public void setFromAndToShape(ClassDiagShape fromShape, ClassDiagShape toShape) {
+        this.fromShape = fromShape;
+        this.toShape = toShape;
+
+        linePoints = new Point[fromShape == toShape ? 5 : 4];
+        selectionBounds = new Rect[linePoints.length - 1];
+    }
+
+    /**
+     * @return the type of Arrow head that lies at the start of this arrow
+     */
+    public ArrHeadType getStartHead() {
+        return startHead;
+    }
+
+    /**
+     * @return the type of Arrow head that lies at the end of this arrow
+     */
+    public ArrHeadType getEndHead() {
+        return endHead;
+    }
+
+    /**
+     * Set a new type of arrowhead that this arrow should start with
+     *
+     * @param startHead new start head
+     */
+    public void setStartHead(ArrHeadType startHead) {
+        this.startHead = startHead;
+    }
+
+    /**
+     * Set a new type of arrowhead that this arrow should start with
+     *
+     * @param endHead new end head
+     */
+    public void setEndHead(ArrHeadType endHead) {
+        this.endHead = endHead;
+    }
+
+    /**
+     * @return true if this arrow has a solid line, false for dashed
+     */
+    public boolean isSolid() {
+        return solid;
+    }
+
+    /**
+     * Set dashed vs solid line
+     *
+     * @param solid true to set this arrow's line as solid, false for dashed
+     */
+    public void setSolid(boolean solid) {
+        this.solid = solid;
+    }
+
+    /**
      * Json representation of this ClassDiagArrow
      *
      * @return a JSONObject containing all the information needed to save and load
@@ -262,6 +400,9 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             obj.put(FileHelper.ITEM_TYPE_KEY, getClass().getName());
             obj.put("cd_arrow_start", this.fromShape.toString());
             obj.put("cd_arrow_end", this.toShape.toString());
+            obj.put("_cd_arrow_solid", this.solid);
+            obj.put("_cd_arrow_start_head", this.startHead.ordinal());
+            obj.put("_cd_arrow_end_head", this.endHead.ordinal());
 
             return obj;
 
@@ -283,6 +424,9 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         try {
             String startShapeStr = jsonObject.getString("cd_arrow_start");
             String endShapeStr = jsonObject.getString("cd_arrow_end");
+            boolean solid = jsonObject.getBoolean("_cd_arrow_solid");
+            ArrHeadType startHead = ArrHeadType.values()[jsonObject.getInt("_cd_arrow_start_head")];
+            ArrHeadType endHead = ArrHeadType.values()[jsonObject.getInt("_cd_arrow_end_head")];
 
             ClassDiagShape startShape = null;
             ClassDiagShape endShape = null;
@@ -296,7 +440,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
             //return a new arrow if we found both the items
             return (startShape == null || endShape == null) ? null
-                    : new ClassDiagArrow(startShape, endShape);
+                    : new ClassDiagArrow(startShape, endShape, solid, startHead, endHead);
         } catch (Exception e) {
             Log.e(TAG, "fromJson: ", e);
             return null;

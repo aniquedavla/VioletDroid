@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -90,7 +92,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
                 fileDialog();
                 break;
             case R.id.class_diag_editor_arrow:
-                addArrow();
+                addOrEditArrow();
                 break;
             case R.id.class_diag_editor_btn4:
                 Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
@@ -283,7 +285,73 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         }
     }
 
-    private void addArrow() {
+    /**
+     * Called to add or edit an arrow
+     */
+    private void addOrEditArrow() {
+        //alert dialog to ask the user to define arrow properties
+        AlertDialog.Builder arrowInputDialog = new AlertDialog.Builder(this);
+        arrowInputDialog.setTitle(R.string.arrow_dialog_title);
+
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.arrow_properties_layout, null);
+
+        final Spinner startHeadPickerSpinner = (Spinner) layout.findViewById(R.id.arrow_head_start_chooser_spinner);
+        final Spinner endHeadPickerSpinner = (Spinner) layout.findViewById(R.id.arrow_head_end_chooser_spinner);
+        final Spinner lineStyleSpinner = (Spinner) layout.findViewById(R.id.arrow_head_line_style_spinner);
+
+        ArrayAdapter<String> headListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                this.getResources().getStringArray(R.array.arr_head_types));
+        ArrayAdapter<String> lineStyleAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+                this.getResources().getStringArray(R.array.arr_line_types));
+
+        startHeadPickerSpinner.setAdapter(headListAdapter);
+        endHeadPickerSpinner.setAdapter(headListAdapter);
+        lineStyleSpinner.setAdapter(lineStyleAdapter);
+
+        if (editorView.getSelected() instanceof ClassDiagArrow) {
+            ClassDiagArrow selectedArrow = (ClassDiagArrow) editorView.getSelected();
+            startHeadPickerSpinner.setSelection(selectedArrow.getStartHead().ordinal(), false);
+            endHeadPickerSpinner.setSelection(selectedArrow.getEndHead().ordinal(), false);
+            lineStyleSpinner.setSelection(selectedArrow.isSolid() ? 0 : 1, false);
+        }
+
+        arrowInputDialog.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ClassDiagArrow.ArrHeadType startType = ClassDiagArrow.ArrHeadType.values()
+                        [startHeadPickerSpinner.getSelectedItemPosition()];
+                ClassDiagArrow.ArrHeadType endType = ClassDiagArrow.ArrHeadType.values()
+                        [endHeadPickerSpinner.getSelectedItemPosition()];
+                boolean solidLine = lineStyleSpinner.getSelectedItemPosition() == 0;
+
+                if (editorView.getSelected() instanceof ClassDiagArrow) {
+                    ClassDiagArrow selectedArrow = (ClassDiagArrow) editorView.getSelected();
+                    selectedArrow.setStartHead(startType);
+                    selectedArrow.setEndHead(endType);
+                    selectedArrow.setSolid(solidLine);
+                    editorView.postInvalidate();
+                } else {
+                    ClassDiagArrow newArrow = new ClassDiagArrow(
+                            null, null, solidLine, startType, endType);
+                    editorView.addDrawable(newArrow);
+                    pickArrowPoints(newArrow);
+                }
+            }
+        });
+
+        arrowInputDialog.setNegativeButton(R.string.cancel_str, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); //do nothing
+            }
+        });
+        arrowInputDialog.setView(layout);
+        arrowInputDialog.show();
+    }
+
+    private void pickArrowPoints(final ClassDiagArrow arrowToEdit) {
+
         Thread arrowThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -314,11 +382,14 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
                 end = editorView.getNewArrowHelper();
 
-                editorView.addDrawable(new ClassDiagArrow(start, end));
+                arrowToEdit.setFromAndToShape(start, end);
+                editorView.postInvalidate();
+
 
             }
         });
         arrowThread.start();
+
     }
 
     private void showToast(final int resId) {
