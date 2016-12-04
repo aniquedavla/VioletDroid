@@ -147,7 +147,6 @@ public final class Paints {
      * @param ctx Context used to calculate the conversion
      * @return px represented as dp for this device
      */
-
     private static int dpFrompx(int px, Context ctx) {
 
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,

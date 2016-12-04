@@ -14,6 +14,9 @@ public class MainActivity extends AppCompatActivity {
 
 //    private static final String TAG = "MainActivity";
 
+    /**
+     * @param savedInstanceState from before 
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Helper method to initialize this Activity
+     */
     private void initialize() {
         Paints.initializePaints(this);
 

@@ -27,7 +27,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     //how far the user can click away from an arrow to select it
     private static final int SELECT_PADDING = 20;
     private final int ARROW_LENGTH = 20;
-    private final double ARROW_ANGLE = Math.PI / 6f;
+    private final double ARROW_ANGLE = Math.PI / 6d;
 
     //this information needs to be saved
     private ClassDiagShape fromShape;
@@ -75,7 +75,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     public void draw(Canvas c, boolean selected) {
         if (fromShape == null || toShape == null) return;
 
-        if (fromShape == toShape) this.direction = ArrDirections.SELF;
+        if (fromShape == toShape) this.direction = ArrDirections.SELF; //arrow points to itself
 
         if (direction == ArrDirections.SELF) {
             calcSelfArrowPoints();
@@ -93,13 +93,14 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             pathLines.lineTo(linePoints[i].x, linePoints[i].y);
         c.drawPath(pathLines, Paints.getDefaultArrowPaint(selected, this.solid));
 
+        //then draw the arrow heads
         drawArrowHead(c, selected, this.startHead, linePoints[0], linePoints[1]);
         drawArrowHead(c, selected, this.endHead,
                 linePoints[linePoints.length - 1], linePoints[linePoints.length - 2]);
     }
 
     /**
-     * Draw an arrow head
+     * Draw an arrow head with the given parameters
      *
      * @param c              Canvas used for drawing
      * @param selected       if this arrow is selected
@@ -107,7 +108,8 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      * @param location       where the arrow points exactly
      * @param directionPoint another point used to determine direction
      */
-    private void drawArrowHead(Canvas c, boolean selected, ArrHeadType headType, Point location, Point directionPoint) {
+    private void drawArrowHead(Canvas c, boolean selected, ArrHeadType headType,
+                               Point location, Point directionPoint) {
         if (headType == ArrHeadType.EMPTY) return;
 
         float dx = location.x - directionPoint.x;
@@ -115,6 +117,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
         double angle = Math.atan2(dy, dx);
 
+        /* logic inspired by Cay Horstmann's Violet */
         float x1 = (float) (location.x - ARROW_LENGTH * Math.cos(angle + ARROW_ANGLE));
         float y1 = (float) (location.y - ARROW_LENGTH * Math.sin(angle + ARROW_ANGLE));
         float x2 = (float) (location.x - ARROW_LENGTH * Math.cos(angle - ARROW_ANGLE));
@@ -142,11 +145,10 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
         c.drawPath(outlinePath, Paints.getDefaultArrowPaint(selected, true));
         c.drawPath(outlinePath, Paints.getDefaultArrowHeadFillPaint(selected, fill));
-
     }
 
     /**
-     * Check this ClassDiagArrow "contains" the given point
+     * Check if this ClassDiagArrow "contains" the given point
      *
      * @param x coordinate of the point
      * @param y coordinate of the point
@@ -182,7 +184,6 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         fromConnectionPoints[2] = new Point(fromShape.outline.right, fromShape.outline.centerY());
         fromConnectionPoints[3] = new Point(fromShape.outline.centerX(), fromShape.outline.bottom);
 
-        //todo::there's definitely a way to make this code shorter
         if (deltaX < 0) { //to is LEFT of from
 
             if (deltaY < 0) { // to is ABOVE from
@@ -317,6 +318,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
     /**
      * Check to see if this arrow points to or from a given object
+     * To be used when deleting items
      *
      * @param drawable to check
      * @return true if the Shape points to/from the object, false otherwise
@@ -400,9 +402,9 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             obj.put(FileHelper.ITEM_TYPE_KEY, getClass().getName());
             obj.put("cd_arrow_start", this.fromShape.toString());
             obj.put("cd_arrow_end", this.toShape.toString());
-            obj.put("_cd_arrow_solid", this.solid);
-            obj.put("_cd_arrow_start_head", this.startHead.ordinal());
-            obj.put("_cd_arrow_end_head", this.endHead.ordinal());
+            obj.put("cd_arrow_solid", this.solid);
+            obj.put("cd_arrow_start_head", this.startHead.ordinal());
+            obj.put("cd_arrow_end_head", this.endHead.ordinal());
 
             return obj;
 
@@ -424,9 +426,9 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         try {
             String startShapeStr = jsonObject.getString("cd_arrow_start");
             String endShapeStr = jsonObject.getString("cd_arrow_end");
-            boolean solid = jsonObject.getBoolean("_cd_arrow_solid");
-            ArrHeadType startHead = ArrHeadType.values()[jsonObject.getInt("_cd_arrow_start_head")];
-            ArrHeadType endHead = ArrHeadType.values()[jsonObject.getInt("_cd_arrow_end_head")];
+            boolean solid = jsonObject.getBoolean("cd_arrow_solid");
+            ArrHeadType startHead = ArrHeadType.values()[jsonObject.getInt("cd_arrow_start_head")];
+            ArrHeadType endHead = ArrHeadType.values()[jsonObject.getInt("cd_arrow_end_head")];
 
             ClassDiagShape startShape = null;
             ClassDiagShape endShape = null;

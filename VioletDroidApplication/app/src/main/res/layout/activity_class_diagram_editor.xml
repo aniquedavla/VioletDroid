@@ -21,34 +21,35 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/class_diag_editor_plus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CLASS"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
-            <Button
                 android:id="@+id/class_diag_editor_file"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/file"
-                style="@style/Widget.AppCompat.Button.Colored" />
+                android:text="@string/file" />
+
+            <Button
+                android:id="@+id/class_diag_editor_class"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/class_str" />
+
+            <Button
+                android:id="@+id/class_diag_editor_note"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/note_str" />
+
 
             <Button
                 android:id="@+id/class_diag_editor_arrow"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/arrow"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
-            <Button
-                android:id="@+id/class_diag_editor_btn4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Button 4"
-                style="@style/Widget.AppCompat.Button.Colored" />
+                android:text="@string/arrow" />
 
 
         </LinearLayout>
@@ -66,35 +67,11 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/class_diag_editor_btn5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Button5"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
-            <Button
-                android:id="@+id/class_diag_editor_bnt6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Button 6"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
-            <Button
-                android:id="@+id/class_diag_editor_note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="note"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
-            <Button
                 android:id="@+id/class_diag_editor_delete"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/delete"
-                style="@style/Widget.AppCompat.Button.Colored" />
-
+                android:text="@string/delete" />
 
         </LinearLayout>
 

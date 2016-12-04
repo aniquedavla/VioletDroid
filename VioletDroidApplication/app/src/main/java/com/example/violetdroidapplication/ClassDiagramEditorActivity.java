@@ -34,12 +34,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     private Button plusBtn;
     private Button fileBtn;
     private Button arrowBtn;
-    private Button btn4;
-    private Button btn5;
-    private Button btn6;
+//    private Button btn4;
+//    private Button btn5;
+//    private Button btn6;
     private Button noteBtn;
     private Button deleteBtn;
 
+    /**
+     * @param savedInstanceState from before
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,28 +67,32 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     private void setViews() {
         editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
 
-        plusBtn = (Button) findViewById(R.id.class_diag_editor_plus);
+        plusBtn = (Button) findViewById(R.id.class_diag_editor_class);
         plusBtn.setOnClickListener(this);
         fileBtn = (Button) findViewById(R.id.class_diag_editor_file);
         fileBtn.setOnClickListener(this);
         arrowBtn = (Button) findViewById(R.id.class_diag_editor_arrow);
         arrowBtn.setOnClickListener(this);
-        btn4 = (Button) findViewById(R.id.class_diag_editor_btn4);
-        btn4.setOnClickListener(this);
-        btn5 = (Button) findViewById(R.id.class_diag_editor_btn5);
-        btn5.setOnClickListener(this);
-        btn6 = (Button) findViewById(R.id.class_diag_editor_bnt6);
-        btn6.setOnClickListener(this);
+//        btn4 = (Button) findViewById(R.id.class_diag_editor_btn4);
+//        btn4.setOnClickListener(this);
+//        btn5 = (Button) findViewById(R.id.class_diag_editor_btn5);
+//        btn5.setOnClickListener(this);
+//        btn6 = (Button) findViewById(R.id.class_diag_editor_bnt6);
+//        btn6.setOnClickListener(this);
         noteBtn = (Button) findViewById(R.id.class_diag_editor_note);
         noteBtn.setOnClickListener(this);
         deleteBtn = (Button) findViewById(R.id.class_diag_editor_delete);
         deleteBtn.setOnClickListener(this);
     }
 
+    /**
+     * onClick implementation
+     * @param v View that was clicked
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.class_diag_editor_plus:
+            case R.id.class_diag_editor_class:
                 editorView.addOrEditItem();
                 break;
             case R.id.class_diag_editor_file:
@@ -94,15 +101,15 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             case R.id.class_diag_editor_arrow:
                 addOrEditArrow();
                 break;
-            case R.id.class_diag_editor_btn4:
-                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.class_diag_editor_btn5:
-                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.class_diag_editor_bnt6:
-                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-                break;
+//            case R.id.class_diag_editor_btn4:
+//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
+//                break;
+//            case R.id.class_diag_editor_btn5:
+//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
+//                break;
+//            case R.id.class_diag_editor_bnt6:
+//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
+//                break;
             case R.id.class_diag_editor_note:
                 editorView.addOrEditNote();
                 break;
@@ -142,6 +149,9 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             super.onBackPressed();
     }
 
+    /**
+     * Shows a dialog, lets the user choose file options
+     */
     private void fileDialog() {
         AlertDialog.Builder fileDialogBuilder = new AlertDialog.Builder(this);
         fileDialogBuilder.setTitle(R.string.file);
@@ -350,6 +360,11 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         arrowInputDialog.show();
     }
 
+    /**
+     * Creates another thread that waits for the user to tap two ClassDiagShapes to define
+     * the start and end points of the arrow
+     * @param arrowToEdit the arrow of interest
+     */
     private void pickArrowPoints(final ClassDiagArrow arrowToEdit) {
 
         Thread arrowThread = new Thread(new Runnable() {
@@ -392,6 +407,10 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
 
     }
 
+    /**
+     * Helper method to show a toast
+     * @param resId of the String to show
+     */
     private void showToast(final int resId) {
         runOnUiThread(new Runnable() {
             @Override

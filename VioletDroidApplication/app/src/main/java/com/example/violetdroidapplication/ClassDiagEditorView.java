@@ -199,6 +199,11 @@ public class ClassDiagEditorView extends View {
         }
     }
 
+    /**
+     * Used to handle touch events
+     * @param event type of MotionEvent
+     * @return true if event was handled here, false otherwise
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getActionMasked();
@@ -375,7 +380,6 @@ public class ClassDiagEditorView extends View {
     /**
      * method used to add or edit a note
      */
-
     public void addOrEditNote() {
         Log.d(TAG, "addOrEditNote");
 

@@ -3,6 +3,7 @@
 
 
     <!--Class Diagram-->
+    <string name="class_str">Class</string>
     <string name="class_diag_enter_title">Enter Class Information</string>
     <string name="class_diag_edit_title">Edit Class Information</string>
     <string name="class_diag_enter_title_hint">Class Name</string>
@@ -13,6 +14,7 @@
             Please choose a new name.</string>
 
     <!--Notes-->
+    <string name="note_str">Note</string>
     <string name="note_enter_title">Enter Note Text</string>
     <string name="note_edit_title">Edit Note Text</string>
     <string name="note_enter_text_hint">Note Text</string>
@@ -43,6 +45,7 @@
     <string name="empty_diagram_dialog_body">Your diagram is empty. Please add items to it before saving.</string>
 
     <string name="delete">Delete</string>
+    <string name="new_str">New</string>
 
     <string name="file_more">File&#8230;</string>
     <string name="file">File</string>
@@ -54,7 +57,7 @@
         <item>Export</item>
     </string-array>
 
-    <string name="new_str">New</string>
+
     <string name="new_class_diagram_dialog_title">New Class Diagram</string>
     <string name="new_class_diagram_dialod_body">Reset the working area and make a new class diagram?</string>
 
