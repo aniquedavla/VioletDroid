@@ -18,8 +18,8 @@ import org.json.JSONObject;
 public class ClassDiagItem extends ClassDiagShape {
     private static final String TAG = "ClassDiagItem";
 
-    private static final int PADDING = 20;
-    private static final int TITLE_PADDING = 30;
+    private static final int TITLE_PADDING_PX = 20;
+    private static final int PADDING_PX = 10;
 
     private String title;
     private String attributes;
@@ -85,24 +85,27 @@ public class ClassDiagItem extends ClassDiagShape {
      * @return the int width
      */
     private int calcMaxWidth() {
+        int titlePaddingDp = Paints.dpFrompx(TITLE_PADDING_PX);
+        int paddingDp = Paints.dpFrompx(PADDING_PX);
+
         int maxWd = 0;
         for (String line : title.split("\n")) {
             Rect temp = new Rect();
             Paints.getDefaultTextTitlePaint().getTextBounds(line, 0, line.length(), temp);
-            if (maxWd < temp.width() + TITLE_PADDING * 2)
-                maxWd = temp.width() + TITLE_PADDING * 2;
+            if (maxWd < temp.width() + titlePaddingDp * 2)
+                maxWd = temp.width() + titlePaddingDp * 2;
         }
         for (String line : attributes.split("\n")) {
             Rect temp = new Rect();
             Paints.getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
-            if (maxWd < temp.width() + PADDING * 2)
-                maxWd = temp.width() + PADDING * 2;
+            if (maxWd < temp.width() + paddingDp * 2)
+                maxWd = temp.width() + paddingDp * 2;
         }
         for (String line : methods.split("\n")) {
             Rect temp = new Rect();
             Paints.getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
-            if (maxWd < temp.width() + PADDING * 2)
-                maxWd = temp.width() + PADDING * 2;
+            if (maxWd < temp.width() + paddingDp * 2)
+                maxWd = temp.width() + paddingDp * 2;
         }
         return maxWd;
     }
@@ -114,12 +117,14 @@ public class ClassDiagItem extends ClassDiagShape {
      * @return an int height
      */
     private int calcMaxHeight() {
-        float ht = (TITLE_PADDING * 2)
+        float titlePaddingDp = Paints.dpFrompx(TITLE_PADDING_PX);
+        float paddingDp = Paints.dpFrompx(PADDING_PX);
+        float ht = (titlePaddingDp * 2)
                 + (Paints.getDefaultTextTitlePaint().descent()
                 - Paints.getDefaultTextTitlePaint().ascent()) * title.split("\n").length;
 
         if (attributes.length() + methods.length() > 0) {
-            ht += PADDING * 4; //twice for attributes, twice for methods (each top/bottom)
+            ht += paddingDp * 4; //twice for attributes, twice for methods (each top/bottom)
             int lineCt = attributes.split("\n").length + methods.split("\n").length;
             ht += (Paints.getDefaultTextPaint().descent() - Paints.getDefaultTextPaint().ascent()) * lineCt;
         }
@@ -134,6 +139,9 @@ public class ClassDiagItem extends ClassDiagShape {
      * @param selected Whether the item is selected
      */
     public void draw(Canvas c, boolean selected) {
+        int titlePaddingDp = Paints.dpFrompx(TITLE_PADDING_PX);
+        int paddingDp = Paints.dpFrompx(PADDING_PX);
+
         //find out how big the outermost rectangle has to be
         Rect bounds = new Rect();
         bounds.left = (int) x;
@@ -149,7 +157,7 @@ public class ClassDiagItem extends ClassDiagShape {
 
         //draw the title
         Rect titleBounds = new Rect();
-        drawMultiLineText(title, c, Paints.getDefaultTextTitlePaint(), x, y, TITLE_PADDING, titleBounds);
+        drawMultiLineText(title, c, Paints.getDefaultTextTitlePaint(), x, y, titlePaddingDp, titleBounds);
 
         if (this.methods.length() + this.attributes.length() > 0) {
 
@@ -160,7 +168,7 @@ public class ClassDiagItem extends ClassDiagShape {
             //draw the attributes
             Rect attrBounds = new Rect();
             drawMultiLineText(attributes, c, Paints.getDefaultTextPaint(), x, y + titleBounds.height(),
-                    PADDING, attrBounds);
+                    paddingDp, attrBounds);
 
             //horizontal line below the attributes
             c.drawLine(x, y + titleBounds.height() + attrBounds.height(),
@@ -170,7 +178,7 @@ public class ClassDiagItem extends ClassDiagShape {
             //draw the methods
             Rect methodsBounds = new Rect();
             drawMultiLineText(methods, c, Paints.getDefaultTextPaint(), x,
-                    y + titleBounds.height() + attrBounds.height(), PADDING, methodsBounds);
+                    y + titleBounds.height() + attrBounds.height(), paddingDp, methodsBounds);
         }
     }
 

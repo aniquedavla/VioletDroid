@@ -25,8 +25,6 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private enum ArrDirections { HVH, VHV, SELF } //calculated automatically, user can not set this
 
     //how far the user can click away from an arrow to select it
-    private static final int SELECT_PADDING = 20;
-    private final int ARROW_LENGTH = 20;
     private final double ARROW_ANGLE = Math.PI / 6d;
 
     //this information needs to be saved
@@ -117,11 +115,13 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
 
         double angle = Math.atan2(dy, dx);
 
+        int arrLength = Paints.dpFrompx(20);
+
         /* logic inspired by Cay Horstmann's Violet */
-        float x1 = (float) (location.x - ARROW_LENGTH * Math.cos(angle + ARROW_ANGLE));
-        float y1 = (float) (location.y - ARROW_LENGTH * Math.sin(angle + ARROW_ANGLE));
-        float x2 = (float) (location.x - ARROW_LENGTH * Math.cos(angle - ARROW_ANGLE));
-        float y2 = (float) (location.y - ARROW_LENGTH * Math.sin(angle - ARROW_ANGLE));
+        float x1 = (float) (location.x - arrLength * Math.cos(angle + ARROW_ANGLE));
+        float y1 = (float) (location.y - arrLength * Math.sin(angle + ARROW_ANGLE));
+        float x2 = (float) (location.x - arrLength * Math.cos(angle - ARROW_ANGLE));
+        float y2 = (float) (location.y - arrLength * Math.sin(angle - ARROW_ANGLE));
 
         Path outlinePath = new Path();
         outlinePath.moveTo(location.x, location.y);
@@ -136,15 +136,15 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             outlinePath.lineTo(x2, y2);
             outlinePath.close();
         } else if (headType == ArrHeadType.DIAMOND || headType == ArrHeadType.FILLED_DIAMOND) {
-            float x3 = (float) (x2 - ARROW_LENGTH * Math.cos(angle + ARROW_ANGLE));
-            float y3 = (float) (y2 - ARROW_LENGTH * Math.sin(angle + ARROW_ANGLE));
+            float x3 = (float) (x2 - arrLength * Math.cos(angle + ARROW_ANGLE));
+            float y3 = (float) (y2 - arrLength * Math.sin(angle + ARROW_ANGLE));
             outlinePath.lineTo(x3, y3);
             outlinePath.lineTo(x2, y2);
             outlinePath.close();
         }
 
-        c.drawPath(outlinePath, Paints.getDefaultArrowPaint(selected, true));
         c.drawPath(outlinePath, Paints.getDefaultArrowHeadFillPaint(selected, fill));
+        c.drawPath(outlinePath, Paints.getDefaultArrowPaint(selected, true));
     }
 
     /**
@@ -296,18 +296,20 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
         int right;
         int bottom;
 
+        int selectPadding = Paints.dpFrompx(20);
+
         if (a.x == b.x) { //the points are vertical to each other
 
             top = (a.y < b.y) ? a.y : b.y;
             bottom = (a.y > b.y) ? a.y : b.y;
-            left = a.x - SELECT_PADDING;
-            right = a.x + SELECT_PADDING;
+            left = a.x - selectPadding;
+            right = a.x + selectPadding;
             return new Rect(left, top, right, bottom);
 
         } else if (a.y == b.y) { //the points are horizontal to each other
 
-            top = a.y - SELECT_PADDING;
-            bottom = a.y + SELECT_PADDING;
+            top = a.y - selectPadding;
+            bottom = a.y + selectPadding;
             left = (a.x < b.x) ? a.x : b.x;
             right = (a.x > b.x) ? a.x : b.x;
 

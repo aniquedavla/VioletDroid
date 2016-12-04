@@ -39,14 +39,14 @@ public final class Paints {
         Paints.ctx = ctx;
         defaultTextTitlePaint = new Paint();
         defaultTextTitlePaint.setStyle(Paint.Style.FILL);
-        defaultTextTitlePaint.setTextSize(dpFrompx(22, ctx));
+        defaultTextTitlePaint.setTextSize(dpFrompx(22));
 
         defaultTextPaint = new Paint();
         defaultTextPaint.setStyle(Paint.Style.FILL);
-        defaultTextPaint.setTextSize(dpFrompx(18, ctx));
+        defaultTextPaint.setTextSize(dpFrompx(18));
 
         defaultOutlinePaint = new Paint();
-        defaultOutlinePaint.setStrokeWidth(dpFrompx(2, ctx));
+        defaultOutlinePaint.setStrokeWidth(dpFrompx(2));
         defaultOutlinePaint.setStyle(Paint.Style.STROKE);
         defaultOutlinePaint.setColor(Color.BLACK);
 
@@ -59,11 +59,11 @@ public final class Paints {
         defaultBgNotePaint.setStyle(Paint.Style.FILL);
 
         defaultArrowPaint = new Paint();
-        defaultArrowPaint.setStrokeWidth(dpFrompx(2, ctx));
         defaultArrowPaint.setStyle(Paint.Style.STROKE);
 
         defaultArrowHeadFillPaint = new Paint();
         defaultArrowHeadFillPaint.setStyle(Paint.Style.FILL);
+
     }
 
     /**
@@ -115,11 +115,11 @@ public final class Paints {
      */
     public static Paint getDefaultArrowPaint(boolean selected, boolean solid) {
         defaultArrowPaint.setColor(selected ? Color.BLUE : Color.BLACK);
-        defaultArrowPaint.setStrokeWidth(selected ? dpFrompx(4, ctx) : 2);
+        defaultArrowPaint.setStrokeWidth(selected ? dpFrompx(4) : dpFrompx(2));
         if (!solid && !selected) //dashed effect
-            defaultArrowPaint.setPathEffect(new DashPathEffect(new float[]{24, 16}, 0));
+            defaultArrowPaint.setPathEffect(new DashPathEffect(new float[]{dpFrompx(20), dpFrompx(12)}, 0));
         else if (!solid)
-            defaultArrowPaint.setPathEffect(new DashPathEffect(new float[]{36, 24}, 0));
+            defaultArrowPaint.setPathEffect(new DashPathEffect(new float[]{dpFrompx(16), dpFrompx(16)}, 0));
         else
             defaultArrowPaint.setPathEffect(null);
         return defaultArrowPaint;
@@ -144,10 +144,9 @@ public final class Paints {
      * convert pixels to density independent pixels
      *
      * @param px  a number in pixels unit
-     * @param ctx Context used to calculate the conversion
-     * @return px represented as dp for this device
+     * @return inputted px represented as dp for this device
      */
-    private static int dpFrompx(int px, Context ctx) {
+    public static int dpFrompx(int px) {
 
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 px, ctx.getResources().getDisplayMetrics());

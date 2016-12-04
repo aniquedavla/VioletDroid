@@ -73,12 +73,13 @@ public class ClassDiagNote extends ClassDiagShape {
      * @return the int width
      */
     private int calcMaxWidth() {
+        int paddingDp = Paints.dpFrompx(PADDING);
         int maxWd = 0;
         for (String line : text.split("\n")) {
             Rect temp = new Rect();
             Paints.getDefaultTextPaint().getTextBounds(line, 0, line.length(), temp);
-            if (maxWd < temp.width() + PADDING * 2)
-                maxWd = temp.width() + PADDING * 2;
+            if (maxWd < temp.width() + paddingDp * 2)
+                maxWd = temp.width() + paddingDp * 2;
         }
         return maxWd;
     }
@@ -90,7 +91,8 @@ public class ClassDiagNote extends ClassDiagShape {
      * @return an int height
      */
     private int calcMaxHeight() {
-        float ht = (PADDING * 2)
+        float paddingDp = Paints.dpFrompx(PADDING);
+        float ht = (paddingDp * 2)
                 + (Paints.getDefaultTextPaint().descent()
                 - Paints.getDefaultTextPaint().ascent()) * text.split("\n").length;
 
@@ -104,6 +106,7 @@ public class ClassDiagNote extends ClassDiagShape {
      * @param selected Whether the item is selected
      */
     public void draw(Canvas c, boolean selected) {
+        int paddingDp = Paints.dpFrompx(PADDING);
         //find out how big the outermost rectangle has to be
         Rect bounds = new Rect();
         bounds.left = (int) x;
@@ -134,7 +137,7 @@ public class ClassDiagNote extends ClassDiagShape {
         c.drawPath(bgPath, Paints.getDefaultBgNotePaint(selected));
 
         //draw the text
-        drawMultiLineText(text, c, Paints.getDefaultTextPaint(), x, y, PADDING, bounds);
+        drawMultiLineText(text, c, Paints.getDefaultTextPaint(), x, y, paddingDp, bounds);
     }
 
     /**
