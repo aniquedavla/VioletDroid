@@ -13,14 +13,14 @@ import java.util.List;
 /**
  * Created by vishaalprasad on 11/28/16.
  */
-public class ClassDiagArrow implements ClassDiagramDrawable {
+public class UmlBentArrow implements UmlDrawable {
 
     /**
      * possible arrow head types
      */
     public enum ArrHeadType { EMPTY, V, TRIANGLE, FILLED_TRIANGLE, DIAMOND, FILLED_DIAMOND }
 
-    private static final String TAG = "ClassDiagArrow";
+    private static final String TAG = "UmlBentArrow";
 
     private enum ArrDirections { HVH, VHV, SELF } //calculated automatically, user can not set this
 
@@ -28,8 +28,8 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private final double ARROW_ANGLE = Math.PI / 6d;
 
     //this information needs to be saved
-    private ClassDiagShape fromShape;
-    private ClassDiagShape toShape;
+    private UmlNode fromShape;
+    private UmlNode toShape;
     private boolean solid;
     private ArrHeadType startHead;
     private ArrHeadType endHead;
@@ -42,16 +42,16 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     private Rect[] selectionBounds; //used for selection
 
     /**
-     * Create a new ClassDiagArrow with the given attributes
+     * Create a new UmlBentArrow with the given attributes
      *
-     * @param fromShape where the ClassDiagArrow should point from
-     * @param toShape   where the ClassDiagArrow should point to
+     * @param fromShape where the UmlBentArrow should point from
+     * @param toShape   where the UmlBentArrow should point to
      * @param solid     true for solid line arrow, false for dashed
      * @param startHead the type of arrowhead to be used at the start of the arrow
      * @param endHead   the type of arrowhead to be used at the end of an arrow
      */
-    public ClassDiagArrow(ClassDiagShape fromShape, ClassDiagShape toShape, boolean solid,
-                          ArrHeadType startHead, ArrHeadType endHead) {
+    public UmlBentArrow(UmlNode fromShape, UmlNode toShape, boolean solid,
+                        ArrHeadType startHead, ArrHeadType endHead) {
         this.fromShape = fromShape;
         this.toShape = toShape;
         this.solid = solid;
@@ -65,10 +65,10 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     }
 
     /**
-     * Draw this ClassDiagArrow to a given Canvas
+     * Draw this UmlBentArrow to a given Canvas
      *
-     * @param c        Canvas on which to draw the ClassDiagArrow
-     * @param selected if the ClassDiagArrow is selected, changes the appearance
+     * @param c        Canvas on which to draw the UmlBentArrow
+     * @param selected if the UmlBentArrow is selected, changes the appearance
      */
     public void draw(Canvas c, boolean selected) {
         if (fromShape == null || toShape == null) return;
@@ -148,7 +148,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     }
 
     /**
-     * Check if this ClassDiagArrow "contains" the given point
+     * Check if this UmlBentArrow "contains" the given point
      *
      * @param x coordinate of the point
      * @param y coordinate of the point
@@ -325,7 +325,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      * @param drawable to check
      * @return true if the Shape points to/from the object, false otherwise
      */
-    public boolean reliesOn(ClassDiagramDrawable drawable) {
+    public boolean reliesOn(UmlDrawable drawable) {
         return drawable == this.fromShape || drawable == this.toShape;
     }
 
@@ -335,7 +335,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
      * @param fromShape where this arrow should point from
      * @param toShape   where this arrow should point to
      */
-    public void setFromAndToShape(ClassDiagShape fromShape, ClassDiagShape toShape) {
+    public void setFromAndToShape(UmlNode fromShape, UmlNode toShape) {
         this.fromShape = fromShape;
         this.toShape = toShape;
 
@@ -392,7 +392,7 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     }
 
     /**
-     * Json representation of this ClassDiagArrow
+     * Json representation of this UmlBentArrow
      *
      * @return a JSONObject containing all the information needed to save and load
      */
@@ -417,14 +417,14 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
     }
 
     /**
-     * Get a ClassDiagArrow from a saved JSONObject representing a ClassDiagArrow
+     * Get a UmlBentArrow from a saved JSONObject representing a UmlBentArrow
      *
-     * @param jsonObject     representing a ClassDiagArrow
-     * @param alldrDrawables all possible shapes this ClassDiagArrow can point to/from
-     * @return a new ClassDiagArrow
+     * @param jsonObject     representing a UmlBentArrow
+     * @param alldrDrawables all possible shapes this UmlBentArrow can point to/from
+     * @return a new UmlBentArrow
      */
-    public static ClassDiagArrow fromJson(JSONObject jsonObject,
-                                          List<ClassDiagramDrawable> alldrDrawables) {
+    public static UmlBentArrow fromJson(JSONObject jsonObject,
+                                        List<UmlDrawable> alldrDrawables) {
         try {
             String startShapeStr = jsonObject.getString("cd_arrow_start");
             String endShapeStr = jsonObject.getString("cd_arrow_end");
@@ -432,19 +432,19 @@ public class ClassDiagArrow implements ClassDiagramDrawable {
             ArrHeadType startHead = ArrHeadType.values()[jsonObject.getInt("cd_arrow_start_head")];
             ArrHeadType endHead = ArrHeadType.values()[jsonObject.getInt("cd_arrow_end_head")];
 
-            ClassDiagShape startShape = null;
-            ClassDiagShape endShape = null;
+            UmlNode startShape = null;
+            UmlNode endShape = null;
 
-            for (ClassDiagramDrawable shape : alldrDrawables) {
-                if (shape instanceof ClassDiagShape) {
-                    if (shape.toString().equals(startShapeStr)) startShape = (ClassDiagShape) shape;
-                    if (shape.toString().equals(endShapeStr)) endShape = (ClassDiagShape) shape;
+            for (UmlDrawable shape : alldrDrawables) {
+                if (shape instanceof UmlNode) {
+                    if (shape.toString().equals(startShapeStr)) startShape = (UmlNode) shape;
+                    if (shape.toString().equals(endShapeStr)) endShape = (UmlNode) shape;
                 }
             }
 
             //return a new arrow if we found both the items
             return (startShape == null || endShape == null) ? null
-                    : new ClassDiagArrow(startShape, endShape, solid, startHead, endHead);
+                    : new UmlBentArrow(startShape, endShape, solid, startHead, endHead);
         } catch (Exception e) {
             Log.e(TAG, "fromJson: ", e);
             return null;

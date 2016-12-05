@@ -39,9 +39,9 @@ public class SeqDiagEditorView extends View {
     private static final String TAG = "SeqDiagEditorView";
 
     //Items: everything here needs to be saved/loaded
-    private ArrayList<ClassDiagramDrawable> allClassDrawables;
+    private ArrayList<UmlDrawable> allClassDrawables;
 
-    private ClassDiagramDrawable selected = null; //null means none are selected
+    private UmlDrawable selected = null; //null means none are selected
     private Context ctx;
 
     private int x;  // starting x-coordinate of touch
@@ -54,7 +54,7 @@ public class SeqDiagEditorView extends View {
     private boolean isLongPressed = false;
 
     //only used temporarily
-    private ClassDiagShape newArrowHelper;
+    private UmlNode newArrowHelper;
     private boolean waitingForArrowInput = false;
 
     //cell layout
@@ -169,7 +169,7 @@ public class SeqDiagEditorView extends View {
 
         Log.d(TAG, "onDraw, selected: " + selected);
 
-        for (ClassDiagramDrawable drawable : allClassDrawables)
+        for (UmlDrawable drawable : allClassDrawables)
             drawable.draw(canvas, selected == drawable);
 
         if (numColumns == 0 || numRows == 0)
@@ -206,9 +206,9 @@ public class SeqDiagEditorView extends View {
             case MotionEvent.ACTION_DOWN:
                 // longPress will be called in 800 ms if not cancelled
                 if (waitingForArrowInput) {
-                    ClassDiagramDrawable tapped = findItem((int) event.getX(), (int) event.getY());
-                    if (tapped != null && tapped instanceof ClassDiagShape) {
-                        newArrowHelper = (ClassDiagShape) tapped;
+                    UmlDrawable tapped = findItem((int) event.getX(), (int) event.getY());
+                    if (tapped != null && tapped instanceof UmlNode) {
+                        newArrowHelper = (UmlNode) tapped;
                         waitingForArrowInput = false;
                     }
                 } else {
@@ -251,8 +251,8 @@ public class SeqDiagEditorView extends View {
                 handler.removeCallbacks(longPress);
                 int moveX = Math.round(event.getX());
                 int moveY = Math.round(event.getY());
-                if (draggable && selected != null && selected instanceof ClassDiagShape) {
-                    ClassDiagShape selectedShape = (ClassDiagShape) selected;
+                if (draggable && selected != null && selected instanceof UmlNode) {
+                    UmlNode selectedShape = (UmlNode) selected;
                     selectedShape.set(moveX, moveY);  // move item by dragging
                     savePending = true;
                 }
@@ -273,10 +273,10 @@ public class SeqDiagEditorView extends View {
      * @param y coordinate of location
      * @return item at the location, null if nothing is there
      */
-    public ClassDiagramDrawable findItem(int x, int y) {
+    public UmlDrawable findItem(int x, int y) {
         Log.i(TAG, "findItem");
 
-        for (ClassDiagramDrawable drawable : allClassDrawables)
+        for (UmlDrawable drawable : allClassDrawables)
             if (drawable.contains(x, y))
                 return drawable;
 
@@ -285,7 +285,7 @@ public class SeqDiagEditorView extends View {
     }
 
     /**
-     * If a ClassDiagItem is already selected, this method will edit its attributes
+     * If a UmlClassNode is already selected, this method will edit its attributes
      * Prompts the user to input attributes
      * Immediately updates the view by redrawing
      */
@@ -293,7 +293,7 @@ public class SeqDiagEditorView extends View {
         Log.d(TAG, "addOrEditItem");
 
         //we are editing an item if we already have one selected, later on selected can be an arrow
-        final boolean editingItem = (selected != null && selected instanceof ClassDiagItem);
+        final boolean editingItem = (selected != null && selected instanceof UmlClassNode);
 
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
@@ -308,9 +308,9 @@ public class SeqDiagEditorView extends View {
 
         //if we're editing an item, populate the dialog with the current contents
         if (editingItem) {
-            inputTitleView.setText(((ClassDiagItem) selected).getTitle());
-            inputAttrsView.setText(((ClassDiagItem) selected).getAttributes());
-            inputMethodsView.setText(((ClassDiagItem) selected).getMethods());
+            inputTitleView.setText(((UmlClassNode) selected).getTitle());
+            inputAttrsView.setText(((UmlClassNode) selected).getAttributes());
+            inputMethodsView.setText(((UmlClassNode) selected).getMethods());
             inputTitleView.selectAll();
         }
 
@@ -326,14 +326,14 @@ public class SeqDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (editingItem) { //if we're editing an item, just update the contents
-                    ((ClassDiagItem) selected).setTexts(inputTitleView.getText().toString(),
+                    ((UmlClassNode) selected).setTexts(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
                             inputMethodsView.getText().toString());
                 } else {
                     // we are creating a new item
 
                     // 100, 100 in the following line is an arbitrary point
-                    selected = new ClassDiagItem(inputTitleView.getText().toString(),
+                    selected = new UmlClassNode(inputTitleView.getText().toString(),
                             inputAttrsView.getText().toString(),
                             //add new item AND select it
                             inputMethodsView.getText().toString(), 100, 100);
@@ -360,7 +360,7 @@ public class SeqDiagEditorView extends View {
         Log.d(TAG, "addOrEditNote");
 
         // we are editing a note if we already have one selected
-        final boolean editingNote = (selected != null && selected instanceof ClassDiagNote);
+        final boolean editingNote = (selected != null && selected instanceof UmlNoteNode);
 
         final LinearLayout inputHolders = new LinearLayout(ctx);
         inputHolders.setOrientation(LinearLayout.VERTICAL);
@@ -369,7 +369,7 @@ public class SeqDiagEditorView extends View {
 
         //if we're editing a note, populate the dialog with the current contents
         if (editingNote) {
-            inputTextView.setText(((ClassDiagNote) selected).getText());
+            inputTextView.setText(((UmlNoteNode) selected).getText());
             inputTextView.selectAll();
         }
 
@@ -384,13 +384,13 @@ public class SeqDiagEditorView extends View {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (editingNote) { //if we're editing a note, just update the contents
-                    ((ClassDiagNote) selected).setText(inputTextView.getText().toString());
+                    ((UmlNoteNode) selected).setText(inputTextView.getText().toString());
                 } else {
-                    selected = new ClassDiagNote(inputTextView.getText().toString(), 100, 100);
+                    selected = new UmlNoteNode(inputTextView.getText().toString(), 100, 100);
 
                     Log.i(TAG, "Creating note: " + selected);
 
-                    allClassDrawables.add(((ClassDiagNote) selected));
+                    allClassDrawables.add(((UmlNoteNode) selected));
                 }
 
                 savePending = true; //we've made changes to the editor
@@ -407,10 +407,10 @@ public class SeqDiagEditorView extends View {
     }
 
     /**
-     * Add a ClassDiagramDrawable to this View
+     * Add a UmlDrawable to this View
      * @param drawable to add to this View
      */
-    public void addDrawable(ClassDiagramDrawable drawable) {
+    public void addDrawable(UmlDrawable drawable) {
         allClassDrawables.add(drawable);
         postInvalidate();
     }
@@ -427,7 +427,7 @@ public class SeqDiagEditorView extends View {
     /**
      * @return an ArrayList contianing all the drawables
      */
-    public ArrayList<ClassDiagramDrawable> getAllClassDrawables() {
+    public ArrayList<UmlDrawable> getAllClassDrawables() {
         return allClassDrawables;
     }
 
@@ -449,9 +449,9 @@ public class SeqDiagEditorView extends View {
 
     /**
      * Get the object that the user tapped if waiting for an object
-     * @return ClassDiagShape that the user tapped
+     * @return UmlNode that the user tapped
      */
-    public ClassDiagShape getNewArrowHelper() {
+    public UmlNode getNewArrowHelper() {
         return newArrowHelper;
     }
 
@@ -461,7 +461,7 @@ public class SeqDiagEditorView extends View {
     public JSONObject toJson() {
         try {
             JSONArray arr = new JSONArray();
-            for (ClassDiagramDrawable drawable : allClassDrawables)
+            for (UmlDrawable drawable : allClassDrawables)
                 arr.put(drawable.toJson());
 
             JSONObject obj = new JSONObject();

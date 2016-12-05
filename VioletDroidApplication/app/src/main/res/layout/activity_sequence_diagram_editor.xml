@@ -100,11 +100,11 @@
 
     </LinearLayout>
 
-    <com.example.violetdroidapplication.ClassDiagEditorView
+    <com.example.violetdroidapplication.UmlEditorView
         android:id="@+id/seq_diag_editor_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.example.violetdroidapplication.ClassDiagEditorView>
+    </com.example.violetdroidapplication.UmlEditorView>
 
 </LinearLayout>

@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">VioletDroid Application</string>
-
+    <string name="app_name">VioletDroid</string>
 
     <!--Class Diagram-->
     <string name="class_str">Class</string>

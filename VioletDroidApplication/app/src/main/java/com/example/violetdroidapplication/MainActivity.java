@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.main_class_editor_button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent editorIntent = new Intent(MainActivity.this, ClassDiagramEditorActivity.class);
+                Intent editorIntent = new Intent(MainActivity.this, UmlEditorActivity.class);
                 startActivity(editorIntent);
             }
         });
