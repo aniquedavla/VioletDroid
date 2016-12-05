@@ -37,9 +37,6 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
     private Button plusBtn;
     private Button fileBtn;
     private Button arrowBtn;
-    //    private Button btn4;
-//    private Button btn5;
-//    private Button btn6;
     private Button noteBtn;
     private Button deleteBtn;
 
@@ -50,31 +47,20 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        UmlEditorView pixelGrid = new UmlEditorView(this);
-//        pixelGrid.setNumColumns(10);
-//        pixelGrid.setNumRows(20);
-//        setContentView(new pixelGridView(this));
-
+        //create the pixel grid
         PixelGridView pixelGridView = new PixelGridView(this);
         pixelGridView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
+        //set the pixel grid to the activity
         setContentView(pixelGridView);
 
-
+        //then add the uml editor on top of the pixel grid
         LayoutInflater inflater = getLayoutInflater();
-
-//        getWindow().setContentView(new PixelGridView(this),
-//                new ViewGroup.LayoutParams(
-//                        ViewGroup.LayoutParams.FILL_PARENT,
-//                        ViewGroup.LayoutParams.FILL_PARENT));
-
         getWindow().addContentView(inflater.inflate(R.layout.uml_diagram_editor, null),
                 new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.FILL_PARENT,
                         ViewGroup.LayoutParams.FILL_PARENT));
-
-//        setContentView(R.layout.uml_diagram_editor);
 
         setViews();
     }
@@ -91,12 +77,6 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
         fileBtn.setOnClickListener(this);
         arrowBtn = (Button) findViewById(R.id.class_diag_editor_arrow);
         arrowBtn.setOnClickListener(this);
-//        btn4 = (Button) findViewById(R.id.class_diag_editor_btn4);
-//        btn4.setOnClickListener(this);
-//        btn5 = (Button) findViewById(R.id.class_diag_editor_btn5);
-//        btn5.setOnClickListener(this);
-//        btn6 = (Button) findViewById(R.id.class_diag_editor_bnt6);
-//        btn6.setOnClickListener(this);
         noteBtn = (Button) findViewById(R.id.class_diag_editor_note);
         noteBtn.setOnClickListener(this);
         deleteBtn = (Button) findViewById(R.id.class_diag_editor_delete);
@@ -120,15 +100,6 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
             case R.id.class_diag_editor_arrow:
                 addOrEditArrow();
                 break;
-//            case R.id.class_diag_editor_btn4:
-//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-//                break;
-//            case R.id.class_diag_editor_btn5:
-//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-//                break;
-//            case R.id.class_diag_editor_bnt6:
-//                Toast.makeText(this, "Button not implemented", Toast.LENGTH_SHORT).show();
-//                break;
             case R.id.class_diag_editor_note:
                 editorView.addOrEditNote();
                 break;
@@ -664,14 +635,23 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
         private int cellDimens;
         private Paint blackPaint = new Paint();
 
+        /**
+         * Create a new pixel grid
+         * @param ctx of the calling Activity
+         */
         public PixelGridView(Context ctx) {
             super(ctx, null);
             blackPaint.setStyle(Paint.Style.STROKE);
             cellDimens = Paints.dpFrompx(10);
-
-            Log.i(TAG, "pixelGridView: c: [" + numColumns + "] r: " + numRows + "]");
         }
 
+        /**
+         * Callback for when the size is changed
+         * @param w current width
+         * @param h current height
+         * @param oldw old width
+         * @param oldh old height
+         */
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
@@ -680,13 +660,14 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
             postInvalidate();
         }
 
+        /**
+         * @param canvas to draw on
+         */
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
             numColumns = getWidth() / cellDimens;
             numRows = getHeight() / cellDimens;
-
-            Log.i(TAG, "onDraw");
 
             for (int i = 1; i < numColumns; i++) {
                 canvas.drawLine(i * cellDimens, 0, i * cellDimens, getHeight(), blackPaint);

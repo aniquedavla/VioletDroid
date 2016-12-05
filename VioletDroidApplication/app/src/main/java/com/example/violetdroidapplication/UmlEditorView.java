@@ -276,7 +276,7 @@ public class UmlEditorView extends View {
         });
         builder.show();
     }
-
+    
     /**
      * method used to add or edit a note
      */
