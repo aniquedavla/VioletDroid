@@ -24,13 +24,13 @@ import java.io.FilenameFilter;
 /**
  * Contains a ClassDiagEditorView and buttons to allow the user to create class diagrams
  */
-public class ClassDiagramEditorActivity extends AppCompatActivity implements View.OnClickListener {
+public class UmlEditorActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ClassDiagEditorAct";
 
     private File currentFile = null;
 
-    private ClassDiagEditorView editorView;
+    private UmlEditorView editorView;
     private Button plusBtn;
     private Button fileBtn;
     private Button arrowBtn;
@@ -47,7 +47,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ClassDiagEditorView pixelGrid = new ClassDiagEditorView(this);
+        UmlEditorView pixelGrid = new UmlEditorView(this);
         pixelGrid.setNumColumns(10);
         pixelGrid.setNumRows(20);
         setContentView(pixelGrid);
@@ -65,7 +65,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * initialize the views in this Activity
      */
     private void setViews() {
-        editorView = (ClassDiagEditorView) findViewById(R.id.class_diag_editor_view);
+        editorView = (UmlEditorView) findViewById(R.id.class_diag_editor_view);
 
         plusBtn = (Button) findViewById(R.id.class_diag_editor_class);
         plusBtn.setOnClickListener(this);
@@ -134,7 +134,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
             unsavedChangesDialog.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ClassDiagramEditorActivity.super.onBackPressed();
+                    UmlEditorActivity.super.onBackPressed();
                     dialog.dismiss();
                 }
             });
@@ -200,17 +200,17 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         currentFile = f; //this is referenced later on in saveAs
         try {
             //get a JSONArray with all the items
-            JSONArray arr = obj.getJSONArray(ClassDiagEditorView.ITEMS_KEY);
+            JSONArray arr = obj.getJSONArray(UmlEditorView.ITEMS_KEY);
 
             //for each item, add it to the view
             for (int i = 0; i < arr.length(); i++) {
-                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
-                    editorView.addDrawable(ClassDiagItem.fromJson(arr.getJSONObject(i)));
-                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagNote.class.getName()))
-                    editorView.addDrawable(ClassDiagNote.fromJson(arr.getJSONObject(i)));
+                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(UmlClassNode.class.getName()))
+                    editorView.addDrawable(UmlClassNode.fromJson(arr.getJSONObject(i)));
+                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(UmlNoteNode.class.getName()))
+                    editorView.addDrawable(UmlNoteNode.fromJson(arr.getJSONObject(i)));
                 else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY)
-                        .equals(ClassDiagArrow.class.getName()))
-                    editorView.addDrawable(ClassDiagArrow.fromJson(arr.getJSONObject(i),
+                        .equals(UmlBentArrow.class.getName()))
+                    editorView.addDrawable(UmlBentArrow.fromJson(arr.getJSONObject(i),
                             editorView.getAllClassDrawables()));
             }
 
@@ -319,8 +319,8 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         endHeadPickerSpinner.setAdapter(headListAdapter);
         lineStyleSpinner.setAdapter(lineStyleAdapter);
 
-        if (editorView.getSelected() instanceof ClassDiagArrow) {
-            ClassDiagArrow selectedArrow = (ClassDiagArrow) editorView.getSelected();
+        if (editorView.getSelected() instanceof UmlBentArrow) {
+            UmlBentArrow selectedArrow = (UmlBentArrow) editorView.getSelected();
             startHeadPickerSpinner.setSelection(selectedArrow.getStartHead().ordinal(), false);
             endHeadPickerSpinner.setSelection(selectedArrow.getEndHead().ordinal(), false);
             lineStyleSpinner.setSelection(selectedArrow.isSolid() ? 0 : 1, false);
@@ -329,20 +329,20 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         arrowInputDialog.setPositiveButton(R.string.done_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ClassDiagArrow.ArrHeadType startType = ClassDiagArrow.ArrHeadType.values()
+                UmlBentArrow.ArrHeadType startType = UmlBentArrow.ArrHeadType.values()
                         [startHeadPickerSpinner.getSelectedItemPosition()];
-                ClassDiagArrow.ArrHeadType endType = ClassDiagArrow.ArrHeadType.values()
+                UmlBentArrow.ArrHeadType endType = UmlBentArrow.ArrHeadType.values()
                         [endHeadPickerSpinner.getSelectedItemPosition()];
                 boolean solidLine = lineStyleSpinner.getSelectedItemPosition() == 0;
 
-                if (editorView.getSelected() instanceof ClassDiagArrow) {
-                    ClassDiagArrow selectedArrow = (ClassDiagArrow) editorView.getSelected();
+                if (editorView.getSelected() instanceof UmlBentArrow) {
+                    UmlBentArrow selectedArrow = (UmlBentArrow) editorView.getSelected();
                     selectedArrow.setStartHead(startType);
                     selectedArrow.setEndHead(endType);
                     selectedArrow.setSolid(solidLine);
                     editorView.postInvalidate();
                 } else {
-                    ClassDiagArrow newArrow = new ClassDiagArrow(
+                    UmlBentArrow newArrow = new UmlBentArrow(
                             null, null, solidLine, startType, endType);
                     editorView.addDrawable(newArrow);
                     pickArrowPoints(newArrow);
@@ -365,13 +365,13 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
      * the start and end points of the arrow
      * @param arrowToEdit the arrow of interest
      */
-    private void pickArrowPoints(final ClassDiagArrow arrowToEdit) {
+    private void pickArrowPoints(final UmlBentArrow arrowToEdit) {
 
         Thread arrowThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                ClassDiagShape start;
-                ClassDiagShape end;
+                UmlNode start;
+                UmlNode end;
 
                 showToast(R.string.arrow_start);
                 editorView.setWaitingForArrowInput(true);
@@ -415,7 +415,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(ClassDiagramEditorActivity.this, resId, Toast.LENGTH_SHORT).show();
+                Toast.makeText(UmlEditorActivity.this, resId, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -571,7 +571,7 @@ public class ClassDiagramEditorActivity extends AppCompatActivity implements Vie
         overwriteWarning.setPositiveButton(R.string.yes_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (FileHelper.writeFile(toWrite, destFile, ClassDiagramEditorActivity.this))
+                if (FileHelper.writeFile(toWrite, destFile, UmlEditorActivity.this))
                     if (updateSavePending)
                         editorView.setSavePending(false); //only call setSavePending if we're told to change it
             }

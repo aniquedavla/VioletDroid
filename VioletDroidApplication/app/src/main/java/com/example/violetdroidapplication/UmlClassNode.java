@@ -12,11 +12,11 @@ import org.json.JSONObject;
  */
 
 /**
- * A ClassDiagItem represents one Item in a Class Diagram Editor
+ * A UmlClassNode represents one Item in a Class Diagram Editor
  * It contains the text and the Rectangle around the text
  */
-public class ClassDiagItem extends ClassDiagShape {
-    private static final String TAG = "ClassDiagItem";
+public class UmlClassNode extends UmlNode {
+    private static final String TAG = "UmlClassNode";
 
     private static final int TITLE_PADDING_PX = 20;
     private static final int PADDING_PX = 10;
@@ -26,27 +26,27 @@ public class ClassDiagItem extends ClassDiagShape {
     private String methods;
 
     /**
-     * Create a new ClassDiagItem
+     * Create a new UmlClassNode
      *
-     * @param title      String title to be used in the ClassDiagItem
-     * @param attributes list of attributes to be used in the ClassDiagItem
-     * @param methods    list of methods contained in the ClassDiagItem
+     * @param title      String title to be used in the UmlClassNode
+     * @param attributes list of attributes to be used in the UmlClassNode
+     * @param methods    list of methods contained in the UmlClassNode
      * @param x          coordinate to place this item
      * @param y          coordinate to place this item
      */
-    public ClassDiagItem(String title, String attributes, String methods, float x, float y) {
+    public UmlClassNode(String title, String attributes, String methods, float x, float y) {
         this.title = title;
         this.attributes = attributes;
         this.methods = methods;
         this.x = x;
         this.y = y;
 
-        Log.i(TAG, "ClassDiagItem: methods: " + methods);
+        Log.i(TAG, "UmlClassNode: methods: " + methods);
     }
 
 
     /**
-     * One setter method that handles setting the text contents of this ClassDiagItem
+     * One setter method that handles setting the text contents of this UmlClassNode
      *
      * @param title   the new title
      * @param attrs   the new list of attributes
@@ -59,21 +59,21 @@ public class ClassDiagItem extends ClassDiagShape {
     }
 
     /**
-     * @return the title contained in this ClassDiagItem
+     * @return the title contained in this UmlClassNode
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * @return the list of attributes contained in this ClassDiagItem
+     * @return the list of attributes contained in this UmlClassNode
      */
     public String getAttributes() {
         return attributes;
     }
 
     /**
-     * @return the list of methods contained in this ClassDiagItem
+     * @return the list of methods contained in this UmlClassNode
      */
     public String getMethods() {
         return methods;
@@ -219,7 +219,7 @@ public class ClassDiagItem extends ClassDiagShape {
     }
 
     /**
-     * @return a JSON representation of this ClassDiagItem
+     * @return a JSON representation of this UmlClassNode
      */
     public JSONObject toJson() {
         try {
@@ -241,14 +241,14 @@ public class ClassDiagItem extends ClassDiagShape {
     }
 
     /**
-     * get a ClassDiagItem from a JSONObject
+     * get a UmlClassNode from a JSONObject
      *
-     * @param obj JSONObject representation of a ClassDiagItem
-     * @return a ClassDiagItem of the given JSONObject
+     * @param obj JSONObject representation of a UmlClassNode
+     * @return a UmlClassNode of the given JSONObject
      */
-    public static ClassDiagItem fromJson(JSONObject obj) {
+    public static UmlClassNode fromJson(JSONObject obj) {
         try {
-            return new ClassDiagItem(obj.getString("cdi_title"), obj.getString("cdi_attrs"),
+            return new UmlClassNode(obj.getString("cdi_title"), obj.getString("cdi_attrs"),
                     obj.getString("cdi_methods"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
                     (float) obj.getDouble(FileHelper.LOC_Y_KEY));
         } catch (Exception e) {
