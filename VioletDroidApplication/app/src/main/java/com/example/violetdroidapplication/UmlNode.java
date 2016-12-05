@@ -3,10 +3,11 @@ package com.example.violetdroidapplication;
 import android.graphics.Rect;
 
 /**
- * A shape representing an object in the class diagram
+ * A shape representing an object in the UML diagram
+ * These items are always rectangles
  */
-// TODO: remove duplicate fields/methods from ClassDiagItem and ClassDiagNote
-public abstract class ClassDiagShape implements ClassDiagramDrawable {
+// TODO: remove duplicate fields/methods from UmlClassNode and UmlNoteNode
+public abstract class UmlNode implements UmlDrawable {
     protected float x;
     protected float y;
 
@@ -24,11 +25,11 @@ public abstract class ClassDiagShape implements ClassDiagramDrawable {
     }
 
     /**
-     * Check to see if the given location is contained in this ClassDiagItem
+     * Check to see if the given location is contained in this UmlClassNode
      *
      * @param x coordinate of location
      * @param y coordinate of location
-     * @return true if the given location is contained in this ClassDiagItem, false otherwise
+     * @return true if the given location is contained in this UmlClassNode, false otherwise
      */
     public boolean contains(int x, int y) {
         return this.outline.contains(x, y);

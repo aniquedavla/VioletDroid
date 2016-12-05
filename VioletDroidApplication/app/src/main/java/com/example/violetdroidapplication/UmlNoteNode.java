@@ -10,11 +10,11 @@ import android.util.Log;
 import org.json.JSONObject;
 
 /**
- * A ClassDiagNote represents a note in the class diagram.
+ * A UmlNoteNode represents a note in the class diagram.
  * The user may select its background color from a pre-defined list.
  */
-public class ClassDiagNote extends ClassDiagShape {
-    private static final String TAG = "ClassDiagNote";
+public class UmlNoteNode extends UmlNode {
+    private static final String TAG = "UmlNoteNode";
 
     private static final int PADDING = 20;
 
@@ -24,18 +24,18 @@ public class ClassDiagNote extends ClassDiagShape {
     private float y;
 
     /**
-     * Create a new ClassDiagNote
+     * Create a new UmlNoteNode
      *
      * @param text the text in the note
      * @param x    coordinate to place this item
      * @param y    coordinate to place this item
      */
-    public ClassDiagNote(String text, float x, float y) {
+    public UmlNoteNode(String text, float x, float y) {
         this.text = text;
         this.x = x;
         this.y = y;
 
-        Log.i(TAG, "ClassDiagNote: text: " + text);
+        Log.i(TAG, "UmlNoteNode: text: " + text);
     }
 
     /**
@@ -197,7 +197,7 @@ public class ClassDiagNote extends ClassDiagShape {
     }
 
     /**
-     * @return a JSON representation of this ClassDiagItem
+     * @return a JSON representation of this UmlClassNode
      */
     public JSONObject toJson() {
         try {
@@ -217,14 +217,14 @@ public class ClassDiagNote extends ClassDiagShape {
     }
 
     /**
-     * get a ClassDiagNote from a JSONObject
+     * get a UmlNoteNode from a JSONObject
      *
-     * @param obj JSONObject representation of a ClassDiagNote
-     * @return a ClassDiagNote of the given JSONObject
+     * @param obj JSONObject representation of a UmlNoteNode
+     * @return a UmlNoteNode of the given JSONObject
      */
-    public static ClassDiagNote fromJson(JSONObject obj) {
+    public static UmlNoteNode fromJson(JSONObject obj) {
         try {
-            return new ClassDiagNote(obj.getString("cdn_text"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
+            return new UmlNoteNode(obj.getString("cdn_text"), (float) obj.getDouble(FileHelper.LOC_X_KEY),
                     (float) obj.getDouble(FileHelper.LOC_Y_KEY));
         } catch (Exception e) {
             Log.e(TAG, "fromJson: ", e);

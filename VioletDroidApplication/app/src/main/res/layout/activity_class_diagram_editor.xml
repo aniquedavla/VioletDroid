@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.violetdroidapplication.ClassDiagramEditorActivity">
+    tools:context=".UmlEditorActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -77,11 +77,11 @@
 
     </LinearLayout>
 
-    <com.example.violetdroidapplication.ClassDiagEditorView
+    <com.example.violetdroidapplication.UmlEditorView
         android:id="@+id/class_diag_editor_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.example.violetdroidapplication.ClassDiagEditorView>
+    </com.example.violetdroidapplication.UmlEditorView>
 
 </LinearLayout>

@@ -28,7 +28,7 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
 
     private File currentFile = null;
 
-    private ClassDiagEditorView editorView;
+    private UmlEditorView editorView;
     private Button plusBtn;
     private Button fileBtn;
     private Button arrowBtn;
@@ -42,7 +42,7 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ClassDiagEditorView pixelGrid = new ClassDiagEditorView(this);
+        UmlEditorView pixelGrid = new UmlEditorView(this);
         pixelGrid.setNumColumns(10);
         pixelGrid.setNumRows(20);
         setContentView(pixelGrid);
@@ -60,7 +60,7 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
      * initialize the views in this Activity
      */
     private void setViews() {
-        editorView = (ClassDiagEditorView) findViewById(R.id.seq_diag_editor_view);
+        editorView = (UmlEditorView) findViewById(R.id.seq_diag_editor_view);
 
         plusBtn = (Button) findViewById(R.id.seq_diag_editor_plus);
         plusBtn.setOnClickListener(this);
@@ -188,17 +188,17 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
         currentFile = f; //this is referenced later on in saveAs
         try {
             //get a JSONArray with all the items
-            JSONArray arr = obj.getJSONArray(ClassDiagEditorView.ITEMS_KEY);
+            JSONArray arr = obj.getJSONArray(UmlEditorView.ITEMS_KEY);
 
             //for each item, add it to the view
             for (int i = 0; i < arr.length(); i++) {
-                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagItem.class.getName()))
-                    editorView.addDrawable(ClassDiagItem.fromJson(arr.getJSONObject(i)));
-                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(ClassDiagNote.class.getName()))
-                    editorView.addDrawable(ClassDiagNote.fromJson(arr.getJSONObject(i)));
+                if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(UmlClassNode.class.getName()))
+                    editorView.addDrawable(UmlClassNode.fromJson(arr.getJSONObject(i)));
+                else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY).equals(UmlNoteNode.class.getName()))
+                    editorView.addDrawable(UmlNoteNode.fromJson(arr.getJSONObject(i)));
                 else if (arr.getJSONObject(i).getString(FileHelper.ITEM_TYPE_KEY)
-                        .equals(ClassDiagArrow.class.getName()))
-                    editorView.addDrawable(ClassDiagArrow.fromJson(arr.getJSONObject(i),
+                        .equals(UmlBentArrow.class.getName()))
+                    editorView.addDrawable(UmlBentArrow.fromJson(arr.getJSONObject(i),
                             editorView.getAllClassDrawables()));
             }
 
@@ -287,8 +287,8 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
         Thread arrowThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                ClassDiagShape start;
-                ClassDiagShape end;
+                UmlNode start;
+                UmlNode end;
 
                 showToast(R.string.arrow_start);
                 editorView.setWaitingForArrowInput(true);
@@ -314,7 +314,7 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
 
                 end = editorView.getNewArrowHelper();
 
-//                editorView.addDrawable(new ClassDiagArrow(start, end));
+//                editorView.addDrawable(new UmlBentArrow(start, end));
 
             }
         });
