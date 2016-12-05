@@ -569,6 +569,11 @@ public class ClassDiagEditorView extends View {
      * @return a Bitmap object containing this View's items
      */
     public Bitmap getBitmap() {
+        ClassDiagramDrawable selectedTemp = null;
+        if (selected != null) {
+            selectedTemp = selected;
+            selected = null;
+        }
         Bitmap result = Bitmap.createBitmap(this.getWidth(), this.getHeight(),
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
@@ -578,6 +583,7 @@ public class ClassDiagEditorView extends View {
         else
             canvas.drawColor(Color.WHITE);
         this.draw(canvas);
+        selected = selectedTemp;
         return result;
     }
 
