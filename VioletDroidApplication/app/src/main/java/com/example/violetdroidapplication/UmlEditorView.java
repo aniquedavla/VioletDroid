@@ -569,7 +569,7 @@ public class UmlEditorView extends View {
      * @return a Bitmap object containing this View's items
      */
     public Bitmap getBitmap() {
-        ClassDiagramDrawable selectedTemp = null;
+        UmlDrawable selectedTemp = null;
         if (selected != null) {
             selectedTemp = selected;
             selected = null;
