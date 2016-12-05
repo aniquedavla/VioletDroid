@@ -446,7 +446,6 @@ public class ClassDiagEditorView extends View {
      * @return true if this working area is empty, false otherwise
      */
     public boolean isEmpty() {
-//        return (this.mClassItems.isEmpty() && this.mClassNotes.isEmpty());
         return this.allClassDrawables.isEmpty();
     }
 

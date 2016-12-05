@@ -22,7 +22,7 @@ public final class Paints {
     private static Context ctx;
 
     private static final int SELECTED_BG_PAINT = Color.parseColor("#DBE9F9");  // color of selected item
-    private static final int DEFAULT_NOTE_COLOR = Color.parseColor("#FFFFBB");  // color of selected item
+    private static final int DEFAULT_NOTE_COLOR = Color.parseColor("#FFFFBB");  // color of note
 
     /**
      * Private constructor to make checkstyle happy
@@ -134,7 +134,7 @@ public final class Paints {
      */
     public static Paint getDefaultArrowHeadFillPaint(boolean selected, boolean filledBlack) {
 
-        if (selected) defaultArrowHeadFillPaint.setColor(Color.BLUE);
+        if (selected && filledBlack) defaultArrowHeadFillPaint.setColor(Color.BLUE);
         else if (filledBlack) defaultArrowHeadFillPaint.setColor(Color.BLACK);
         else defaultArrowHeadFillPaint.setColor(Color.WHITE);
         return defaultArrowHeadFillPaint;
