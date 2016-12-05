@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -24,17 +23,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Created by vishaalprasad on 10/27/16.
- */
-
-/**
  * A View to be used inside an Activity
  * This View will be used as the main editor for Class Diagrams
  */
 public class UmlEditorView extends View {
-    /**
-     * used for saving files
-     */
+    /** used for saving file */
     public static final String ITEMS_KEY = "items";
     private static final String FILE_TYPE = "class_diagram";
     private static final String TAG = "ClassDiagEditorView";
@@ -58,14 +51,6 @@ public class UmlEditorView extends View {
     private UmlNode newArrowHelper;
     private boolean waitingForArrowInput = false;
 
-    //cell layout
-    private int numColumns;
-    private int numRows;
-    private int cellWidth;
-    private int cellHeight;
-    private Paint blackPaint = new Paint();
-    private boolean[][] cellChecked;
-
     private boolean savePending = false;
 
     /**
@@ -83,7 +68,6 @@ public class UmlEditorView extends View {
      */
     public UmlEditorView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
-        blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.ctx = ctx;
         allClassDrawables = new ArrayList<>();
 
@@ -101,69 +85,9 @@ public class UmlEditorView extends View {
     }
 
     /**
-     * set the number of columns
-     *
-     * @param numColumns new number of columns
+     * implementation things to draw
+     * @param canvas to draw items
      */
-    public void setNumColumns(int numColumns) {
-        this.numColumns = numColumns;
-        calculateDimensions();
-    }
-
-    /**
-     * @return the number of columns
-     */
-    public int getNumColumns() {
-        return numColumns;
-    }
-
-    /**
-     * set the number of rows
-     *
-     * @param numRows new number of rows
-     */
-    public void setNumRows(int numRows) {
-        this.numRows = numRows;
-        calculateDimensions();
-    }
-
-    /**
-     * called automatically when the size is changed
-     *
-     * @param w    width
-     * @param h    height
-     * @param oldw old width
-     * @param oldh old height
-     */
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        calculateDimensions();
-    }
-
-    /**
-     * used to calculate the dimensions
-     */
-    private void calculateDimensions() {
-        if (numColumns < 1 || numRows < 1) {
-            return;
-        }
-
-        cellWidth = getWidth() / numColumns;
-        cellHeight = getHeight() / numRows;
-
-        cellChecked = new boolean[numColumns][numRows];
-
-        invalidate();
-    }
-
-    /**
-     * @return the number of rows
-     */
-    public int getNumRows() {
-        return numRows;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -173,30 +97,6 @@ public class UmlEditorView extends View {
         for (UmlDrawable drawable : allClassDrawables)
             drawable.draw(canvas, selected == drawable);
 
-        if (numColumns == 0 || numRows == 0)
-            return;
-
-        int width = getWidth();
-        int height = getHeight();
-
-        for (int i = 0; i < numColumns; i++) {
-            for (int j = 0; j < numRows; j++) {
-                if (cellChecked[i][j]) {
-
-                    canvas.drawRect(i * cellWidth, j * cellHeight,
-                            (i + 1) * cellWidth, (j + 1) * cellHeight,
-                            blackPaint);
-                }
-            }
-        }
-
-        for (int i = 1; i < numColumns; i++) {
-            canvas.drawLine(i * cellWidth, 0, i * cellWidth, height, blackPaint);
-        }
-
-        for (int i = 1; i < numRows; i++) {
-            canvas.drawLine(0, i * cellHeight, width, i * cellHeight, blackPaint);
-        }
     }
 
     /**
@@ -415,7 +315,7 @@ public class UmlEditorView extends View {
 
                     Log.i(TAG, "Creating note: " + selected);
 
-                    allClassDrawables.add(((UmlNoteNode) selected));
+                    allClassDrawables.add(selected);
                 }
 
                 savePending = true; //we've made changes to the editor

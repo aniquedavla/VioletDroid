@@ -1,8 +1,11 @@
 package com.example.violetdroidapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,7 +37,7 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
     private Button plusBtn;
     private Button fileBtn;
     private Button arrowBtn;
-//    private Button btn4;
+    //    private Button btn4;
 //    private Button btn5;
 //    private Button btn6;
     private Button noteBtn;
@@ -47,17 +50,32 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UmlEditorView pixelGrid = new UmlEditorView(this);
-        pixelGrid.setNumColumns(10);
-        pixelGrid.setNumRows(20);
-        setContentView(pixelGrid);
+//        UmlEditorView pixelGrid = new UmlEditorView(this);
+//        pixelGrid.setNumColumns(10);
+//        pixelGrid.setNumRows(20);
+//        setContentView(new pixelGridView(this));
 
-        //addContentView(R.layout.activity_class_diagram_editor,);
+        PixelGridView pixelGridView = new PixelGridView(this);
+        pixelGridView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+
+        setContentView(pixelGridView);
+
+
         LayoutInflater inflater = getLayoutInflater();
-        getWindow().addContentView(inflater.inflate(R.layout.activity_class_diagram_editor, null),
+
+//        getWindow().setContentView(new PixelGridView(this),
+//                new ViewGroup.LayoutParams(
+//                        ViewGroup.LayoutParams.FILL_PARENT,
+//                        ViewGroup.LayoutParams.FILL_PARENT));
+
+        getWindow().addContentView(inflater.inflate(R.layout.uml_diagram_editor, null),
                 new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.FILL_PARENT,
                         ViewGroup.LayoutParams.FILL_PARENT));
+
+//        setContentView(R.layout.uml_diagram_editor);
+
         setViews();
     }
 
@@ -65,7 +83,7 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
      * initialize the views in this Activity
      */
     private void setViews() {
-        editorView = (UmlEditorView) findViewById(R.id.class_diag_editor_view);
+        editorView = (UmlEditorView) findViewById(R.id.uml_editor_view);
 
         plusBtn = (Button) findViewById(R.id.class_diag_editor_class);
         plusBtn.setOnClickListener(this);
@@ -87,6 +105,7 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
 
     /**
      * onClick implementation
+     *
      * @param v View that was clicked
      */
     @Override
@@ -363,6 +382,7 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
     /**
      * Creates another thread that waits for the user to tap two ClassDiagShapes to define
      * the start and end points of the arrow
+     *
      * @param arrowToEdit the arrow of interest
      */
     private void pickArrowPoints(final UmlBentArrow arrowToEdit) {
@@ -409,6 +429,7 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
 
     /**
      * Helper method to show a toast
+     *
      * @param resId of the String to show
      */
     private void showToast(final int resId) {
@@ -629,6 +650,51 @@ public class UmlEditorActivity extends AppCompatActivity implements View.OnClick
                 }
             });
             resetAreaDialog.show();
+        }
+    }
+
+    /**
+     * inner class for drawing a pixel grid in the background
+     */
+    class PixelGridView extends View {
+        private static final String TAG = "pixelGridView";
+
+        private int numColumns;
+        private int numRows;
+        private int cellDimens;
+        private Paint blackPaint = new Paint();
+
+        public PixelGridView(Context ctx) {
+            super(ctx, null);
+            blackPaint.setStyle(Paint.Style.STROKE);
+            cellDimens = Paints.dpFrompx(10);
+
+            Log.i(TAG, "pixelGridView: c: [" + numColumns + "] r: " + numRows + "]");
+        }
+
+        @Override
+        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+            super.onSizeChanged(w, h, oldw, oldh);
+            numColumns = getWidth() / cellDimens;
+            numRows = getHeight() / cellDimens;
+            postInvalidate();
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            numColumns = getWidth() / cellDimens;
+            numRows = getHeight() / cellDimens;
+
+            Log.i(TAG, "onDraw");
+
+            for (int i = 1; i < numColumns; i++) {
+                canvas.drawLine(i * cellDimens, 0, i * cellDimens, getHeight(), blackPaint);
+            }
+
+            for (int i = 1; i < numRows; i++) {
+                canvas.drawLine(0, i * cellDimens, getWidth(), i * cellDimens, blackPaint);
+            }
         }
     }
 }

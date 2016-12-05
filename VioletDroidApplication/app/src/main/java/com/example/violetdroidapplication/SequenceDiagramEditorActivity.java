@@ -42,12 +42,12 @@ public class SequenceDiagramEditorActivity extends AppCompatActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UmlEditorView pixelGrid = new UmlEditorView(this);
-        pixelGrid.setNumColumns(10);
-        pixelGrid.setNumRows(20);
-        setContentView(pixelGrid);
+        UmlEditorView umlEditorView = new UmlEditorView(this);
+//        umlEditorView.setNumColumns(10);
+//        umlEditorView.setNumRows(20);
+        setContentView(umlEditorView);
 
-        //addContentView(R.layout.activity_class_diagram_editor,);
+        //addContentView(R.layout.uml_diagram_editor,);
         LayoutInflater inflater = getLayoutInflater();
         getWindow().addContentView(inflater.inflate(R.layout.activity_sequence_diagram_editor, null),
                 new ViewGroup.LayoutParams(
