@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">VioletDroid</string>
 
+    <!--main-->
+    <string name="welcome_to_vd">Welcome to VioletDroid</string>
+    <string name="uml_editor">Open UML Editor</string>
+
+
     <!--Class Diagram-->
     <string name="class_str">Class</string>
     <string name="class_diag_enter_title">Enter Class Information</string>

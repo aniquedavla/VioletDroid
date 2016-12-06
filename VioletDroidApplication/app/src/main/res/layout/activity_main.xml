@@ -10,67 +10,33 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.violetdroidapplication.MainActivity">
 
-    <!--TEMP button to ClassDiagEditor-->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#000"
+        android:layout_marginTop="98dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:text="@string/welcome_to_vd"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.DialogWindowTitle"
+        android:textSize="36sp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:baselineAligned="false"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <TextView
-            android:text="Select a diagram"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.DialogWindowTitle"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/main_class_editor_button"
-            android:layout_toEndOf="@+id/main_class_editor_button"
-            android:textSize="36sp"
-            android:textAllCaps="false"
-            android:textAlignment="center" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:baselineAligned="false"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-
-                <Button
-                    android:text="Sequence Diagram"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/main_sequence_editor_button"
-                    android:background="@color/colorPrimary"
-                    android:elevation="24dp"
-                    style="@android:style/Widget.Material.Button.Colored"
-                    android:layout_weight="0.38" />
-
-                <Button
-                    android:text="Class Diagram"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/main_class_editor_button"
-                    android:layout_weight="0.85"
-                    android:background="@color/colorAccent"
-                    android:elevation="24dp"
-                    style="@android:style/Widget.Material.Button.Colored" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/main_class_editor_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:elevation="24dp"
+        android:padding="10dp"
+        android:background="@drawable/rounded_button"
+        android:textAllCaps="false"
+        android:fontFamily="sans-serif"
+        android:text="@string/uml_editor"/>
 
 </RelativeLayout>
