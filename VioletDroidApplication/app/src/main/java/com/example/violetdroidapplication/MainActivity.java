@@ -12,8 +12,6 @@ import android.widget.Button;
  */
 public class MainActivity extends AppCompatActivity {
 
-//    private static final String TAG = "MainActivity";
-
     /**
      * @param savedInstanceState from before 
      */
@@ -41,5 +39,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(editorIntent);
             }
         });
+
+//        ((Button) findViewById(R.id.main_sequence_editor_button)).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(), "Not implemented yet!", Toast.LENGTH_LONG).show();
+//            }
+//        });
+
     }
 }
